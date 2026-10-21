@@ -1,0 +1,137 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:58:23
+                                                             Page     1-1
+
+
+				; Homework 3: accumulate directly in a 16-bit d
+				ata-segment variable. 
+				.model small 
+ 0100				.stack 100h 
+ 0000				.data 
+ 0000  0000			total dw 0                    ; A byte cannot h
+				old 5050; use a word. 
+ 0000				.code 
+ 0000				start: 
+ 0000  B8 ---- R		    mov ax,@data 
+ 0003  8E D8			    mov ds,ax 
+ 0005  C7 06 0000 R 0000	    mov total,0 
+ 000B  BB 0001			    mov bx,1 
+ 000E  B9 0064			    mov cx,100 
+ 0011				sum_loop: 
+ 0011  01 1E 0000 R		    add total,bx              ; Actual accumula
+				tor is DS:total. 
+ 0015  43			    inc bx 
+ 0016  E2 F9			    loop sum_loop 
+ 0018				sum_done:                     ; DS:total contai
+				ns BA 13 (little endian). 
+ 0018  A1 0000 R		    mov ax,total 
+ 001B  E8 0026 R		    call print_dec 
+ 001E  E8 004F R		    call newline 
+ 0021  B8 4C00			    mov ax,4c00h 
+ 0024  CD 21			    int 21h 
+				 
+				; Print unsigned AX (0..65535) in decimal; pres
+				erve AX/BX/CX/DX. 
+ 0026				print_dec proc near 
+ 0026  50			    push ax 
+ 0027  53			    push bx 
+ 0028  51			    push cx 
+ 0029  52			    push dx 
+ 002A  BB 000A			    mov bx,10 
+ 002D  33 C9			    xor cx,cx 
+ 002F				decimal_split: 
+ 002F  33 D2			    xor dx,dx                 ; DIV uses DX:AX,
+				 not AX alone. 
+ 0031  F7 F3			    div bx 
+ 0033  52			    push dx                   ; Save remainder,
+				 least significant first. 
+ 0034  41			    inc cx 
+ 0035  0B C0			    or ax,ax 
+ 0037  75 F6			    jnz decimal_split 
+ 0039				decimal_write: 
+ 0039  5A			    pop dx                    ; Reverse order g
+				ives most significant first. 
+ 003A  80 C2 30			    add dl,'0' 
+ 003D  B4 02			    mov ah,02h 
+ 003F  CD 21			    int 21h 
+ 0041  E2 F6			    loop decimal_write 
+ 0043  5A			    pop dx 
+ 0044  59			    pop cx 
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:58:23
+                                                             Page     1-2
+
+
+ 0045  5B			    pop bx 
+ 0046  58			    pop ax 
+ 0047  C3			    ret 
+ 0048				print_dec endp 
+				 
+				; Print the '$'-terminated string at DS:DX; pre
+				serve AX. 
+ 0048				puts proc near 
+ 0048  50			    push ax 
+ 0049  B4 09			    mov ah,09h 
+ 004B  CD 21			    int 21h 
+ 004D  58			    pop ax 
+ 004E  C3			    ret 
+ 004F				puts endp 
+				 
+ 004F				newline proc near 
+ 004F  50			    push ax 
+ 0050  52			    push dx 
+ 0051  B2 0D			    mov dl,0dh 
+ 0053  B4 02			    mov ah,02h 
+ 0055  CD 21			    int 21h 
+ 0057  B2 0A			    mov dl,0ah 
+ 0059  B4 02			    mov ah,02h 
+ 005B  CD 21			    int 21h 
+ 005D  5A			    pop dx 
+ 005E  58			    pop ax 
+ 005F  C3			    ret 
+ 0060				newline endp 
+				 
+ 0060				end start 
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:58:23
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	0002	WORD	PUBLIC	'DATA'
+  STACK  . . . . . . . . . . . .  	0100	PARA	STACK	'STACK'
+_TEXT  . . . . . . . . . . . . .  	0060	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+DECIMAL_SPLIT  . . . . . . . . .  	L NEAR	002F	_TEXT
+DECIMAL_WRITE  . . . . . . . . .  	L NEAR	0039	_TEXT
+
+NEWLINE  . . . . . . . . . . . .  	N PROC	004F	_TEXT	Length = 0011
+
+PRINT_DEC  . . . . . . . . . . .  	N PROC	0026	_TEXT	Length = 0022
+PUTS . . . . . . . . . . . . . .  	N PROC	0048	_TEXT	Length = 0007
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	_TEXT
+SUM_DONE . . . . . . . . . . . .  	L NEAR	0018	_TEXT
+SUM_LOOP . . . . . . . . . . . .  	L NEAR	0011	_TEXT
+
+TOTAL  . . . . . . . . . . . . .  	L WORD	0000	_DATA
+
+@CODE  . . . . . . . . . . . . .  	TEXT  _TEXT		
+@CODESIZE  . . . . . . . . . . .  	TEXT  0		
+@DATASIZE  . . . . . . . . . . .  	TEXT  0		
+@FILENAME  . . . . . . . . . . .  	TEXT  SUMDATA		
+
+
+     75 Source  Lines
+     75 Total   Lines
+     23 Symbols
+
+  51150 + 465394 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

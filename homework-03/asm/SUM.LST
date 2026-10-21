@@ -1,0 +1,128 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:58:22
+                                                             Page     1-1
+
+
+				; Homework 3: accumulate 1+2+...+100 in registe
+				r AX. 
+				.model small 
+ 0100				.stack 100h 
+ 0000				.code 
+ 0000				start: 
+ 0000  33 C0			    xor ax,ax 
+ 0002  BB 0001			    mov bx,1 
+ 0005  B9 0064			    mov cx,100 
+ 0008				sum_loop: 
+ 0008  03 C3			    add ax,bx 
+ 000A  43			    inc bx 
+ 000B  E2 FB			    loop sum_loop 
+ 000D				sum_done:                     ; AX=13BAh=5050, 
+				BX=101, CX=0. 
+ 000D  E8 0018 R		    call print_dec 
+ 0010  E8 0041 R		    call newline 
+ 0013  B8 4C00			    mov ax,4c00h 
+ 0016  CD 21			    int 21h 
+				 
+				; Print unsigned AX (0..65535) in decimal; pres
+				erve AX/BX/CX/DX. 
+ 0018				print_dec proc near 
+ 0018  50			    push ax 
+ 0019  53			    push bx 
+ 001A  51			    push cx 
+ 001B  52			    push dx 
+ 001C  BB 000A			    mov bx,10 
+ 001F  33 C9			    xor cx,cx 
+ 0021				decimal_split: 
+ 0021  33 D2			    xor dx,dx                 ; DIV uses DX:AX,
+				 not AX alone. 
+ 0023  F7 F3			    div bx 
+ 0025  52			    push dx                   ; Save remainder,
+				 least significant first. 
+ 0026  41			    inc cx 
+ 0027  0B C0			    or ax,ax 
+ 0029  75 F6			    jnz decimal_split 
+ 002B				decimal_write: 
+ 002B  5A			    pop dx                    ; Reverse order g
+				ives most significant first. 
+ 002C  80 C2 30			    add dl,'0' 
+ 002F  B4 02			    mov ah,02h 
+ 0031  CD 21			    int 21h 
+ 0033  E2 F6			    loop decimal_write 
+ 0035  5A			    pop dx 
+ 0036  59			    pop cx 
+ 0037  5B			    pop bx 
+ 0038  58			    pop ax 
+ 0039  C3			    ret 
+ 003A				print_dec endp 
+				 
+				; Print the '$'-terminated string at DS:DX; pre
+				serve AX. 
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:58:22
+                                                             Page     1-2
+
+
+ 003A				puts proc near 
+ 003A  50			    push ax 
+ 003B  B4 09			    mov ah,09h 
+ 003D  CD 21			    int 21h 
+ 003F  58			    pop ax 
+ 0040  C3			    ret 
+ 0041				puts endp 
+				 
+ 0041				newline proc near 
+ 0041  50			    push ax 
+ 0042  52			    push dx 
+ 0043  B2 0D			    mov dl,0dh 
+ 0045  B4 02			    mov ah,02h 
+ 0047  CD 21			    int 21h 
+ 0049  B2 0A			    mov dl,0ah 
+ 004B  B4 02			    mov ah,02h 
+ 004D  CD 21			    int 21h 
+ 004F  5A			    pop dx 
+ 0050  58			    pop ax 
+ 0051  C3			    ret 
+ 0052				newline endp 
+				 
+ 0052				end start 
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:58:22
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	0000	WORD	PUBLIC	'DATA'
+  STACK  . . . . . . . . . . . .  	0100	PARA	STACK	'STACK'
+_TEXT  . . . . . . . . . . . . .  	0052	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+DECIMAL_SPLIT  . . . . . . . . .  	L NEAR	0021	_TEXT
+DECIMAL_WRITE  . . . . . . . . .  	L NEAR	002B	_TEXT
+
+NEWLINE  . . . . . . . . . . . .  	N PROC	0041	_TEXT	Length = 0011
+
+PRINT_DEC  . . . . . . . . . . .  	N PROC	0018	_TEXT	Length = 0022
+PUTS . . . . . . . . . . . . . .  	N PROC	003A	_TEXT	Length = 0007
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	_TEXT
+SUM_DONE . . . . . . . . . . . .  	L NEAR	000D	_TEXT
+SUM_LOOP . . . . . . . . . . . .  	L NEAR	0008	_TEXT
+
+@CODE  . . . . . . . . . . . . .  	TEXT  _TEXT		
+@CODESIZE  . . . . . . . . . . .  	TEXT  0		
+@DATASIZE  . . . . . . . . . . .  	TEXT  0		
+@FILENAME  . . . . . . . . . . .  	TEXT  SUM		
+
+
+     70 Source  Lines
+     70 Total   Lines
+     22 Symbols
+
+  51180 + 465364 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

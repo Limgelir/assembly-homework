@@ -11,3 +11,5 @@
 *.DISASM.txt -text -whitespace
 homework-01/verification/*.txt -text -whitespace
 homework-02/verification/*.txt -text -whitespace
+class-exercise/verification/*.txt -text -whitespace
+homework-03/verification/*.txt -text -whitespace

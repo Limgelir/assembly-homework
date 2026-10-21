@@ -1,0 +1,56 @@
+SUM
+Microsoft (R) Macro Assembler Version 5.00 
+Copyright (C) Microsoft Corp 1981-1985, 1987.  All rights reserved.
+
+
+  51180 + 465364 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
+
+Microsoft (R) Overlay Linker  Version 3.60
+Copyright (C) Microsoft Corp 1983-1987.  All rights reserved.
+
+
+SUMDATA
+Microsoft (R) Macro Assembler Version 5.00 
+Copyright (C) Microsoft Corp 1981-1985, 1987.  All rights reserved.
+
+
+  51150 + 465394 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
+
+Microsoft (R) Overlay Linker  Version 3.60
+Copyright (C) Microsoft Corp 1983-1987.  All rights reserved.
+
+
+SUMSTACK
+Microsoft (R) Macro Assembler Version 5.00 
+Copyright (C) Microsoft Corp 1981-1985, 1987.  All rights reserved.
+
+
+  51024 + 465520 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
+
+Microsoft (R) Overlay Linker  Version 3.60
+Copyright (C) Microsoft Corp 1983-1987.  All rights reserved.
+
+
+SUMINPUT
+Microsoft (R) Macro Assembler Version 5.00 
+Copyright (C) Microsoft Corp 1981-1985, 1987.  All rights reserved.
+
+
+  50982 + 465562 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
+
+Microsoft (R) Overlay Linker  Version 3.60
+Copyright (C) Microsoft Corp 1983-1987.  All rights reserved.
+
+

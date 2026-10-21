@@ -1,0 +1,28 @@
+HEX2DEC
+Microsoft (R) Macro Assembler Version 5.00 
+Copyright (C) Microsoft Corp 1981-1985, 1987.  All rights reserved.
+
+
+  50996 + 465548 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
+
+Microsoft (R) Overlay Linker  Version 3.60
+Copyright (C) Microsoft Corp 1983-1987.  All rights reserved.
+
+
+DEC2HEX
+Microsoft (R) Macro Assembler Version 5.00 
+Copyright (C) Microsoft Corp 1981-1985, 1987.  All rights reserved.
+
+
+  50996 + 465548 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
+
+Microsoft (R) Overlay Linker  Version 3.60
+Copyright (C) Microsoft Corp 1983-1987.  All rights reserved.
+
+

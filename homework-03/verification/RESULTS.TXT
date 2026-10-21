@@ -1,0 +1,238 @@
+PASS DOS T0001 SUM input="" result="5050" exit=0
+PASS DOS T0002 SUMDATA input="" result="5050" exit=0
+PASS DOS T0003 SUMSTACK input="" result="5050" exit=0
+PASS DOS T0004 SUMINPUT input="1" result="1" exit=0
+PASS DOS T0005 SUMINPUT input="2" result="3" exit=0
+PASS DOS T0006 SUMINPUT input="3" result="6" exit=0
+PASS DOS T0007 SUMINPUT input="4" result="10" exit=0
+PASS DOS T0008 SUMINPUT input="5" result="15" exit=0
+PASS DOS T0009 SUMINPUT input="6" result="21" exit=0
+PASS DOS T0010 SUMINPUT input="7" result="28" exit=0
+PASS DOS T0011 SUMINPUT input="8" result="36" exit=0
+PASS DOS T0012 SUMINPUT input="9" result="45" exit=0
+PASS DOS T0013 SUMINPUT input="10" result="55" exit=0
+PASS DOS T0014 SUMINPUT input="11" result="66" exit=0
+PASS DOS T0015 SUMINPUT input="12" result="78" exit=0
+PASS DOS T0016 SUMINPUT input="13" result="91" exit=0
+PASS DOS T0017 SUMINPUT input="14" result="105" exit=0
+PASS DOS T0018 SUMINPUT input="15" result="120" exit=0
+PASS DOS T0019 SUMINPUT input="16" result="136" exit=0
+PASS DOS T0020 SUMINPUT input="17" result="153" exit=0
+PASS DOS T0021 SUMINPUT input="18" result="171" exit=0
+PASS DOS T0022 SUMINPUT input="19" result="190" exit=0
+PASS DOS T0023 SUMINPUT input="20" result="210" exit=0
+PASS DOS T0024 SUMINPUT input="21" result="231" exit=0
+PASS DOS T0025 SUMINPUT input="22" result="253" exit=0
+PASS DOS T0026 SUMINPUT input="23" result="276" exit=0
+PASS DOS T0027 SUMINPUT input="24" result="300" exit=0
+PASS DOS T0028 SUMINPUT input="25" result="325" exit=0
+PASS DOS T0029 SUMINPUT input="26" result="351" exit=0
+PASS DOS T0030 SUMINPUT input="27" result="378" exit=0
+PASS DOS T0031 SUMINPUT input="28" result="406" exit=0
+PASS DOS T0032 SUMINPUT input="29" result="435" exit=0
+PASS DOS T0033 SUMINPUT input="30" result="465" exit=0
+PASS DOS T0034 SUMINPUT input="31" result="496" exit=0
+PASS DOS T0035 SUMINPUT input="32" result="528" exit=0
+PASS DOS T0036 SUMINPUT input="33" result="561" exit=0
+PASS DOS T0037 SUMINPUT input="34" result="595" exit=0
+PASS DOS T0038 SUMINPUT input="35" result="630" exit=0
+PASS DOS T0039 SUMINPUT input="36" result="666" exit=0
+PASS DOS T0040 SUMINPUT input="37" result="703" exit=0
+PASS DOS T0041 SUMINPUT input="38" result="741" exit=0
+PASS DOS T0042 SUMINPUT input="39" result="780" exit=0
+PASS DOS T0043 SUMINPUT input="40" result="820" exit=0
+PASS DOS T0044 SUMINPUT input="41" result="861" exit=0
+PASS DOS T0045 SUMINPUT input="42" result="903" exit=0
+PASS DOS T0046 SUMINPUT input="43" result="946" exit=0
+PASS DOS T0047 SUMINPUT input="44" result="990" exit=0
+PASS DOS T0048 SUMINPUT input="45" result="1035" exit=0
+PASS DOS T0049 SUMINPUT input="46" result="1081" exit=0
+PASS DOS T0050 SUMINPUT input="47" result="1128" exit=0
+PASS DOS T0051 SUMINPUT input="48" result="1176" exit=0
+PASS DOS T0052 SUMINPUT input="49" result="1225" exit=0
+PASS DOS T0053 SUMINPUT input="50" result="1275" exit=0
+PASS DOS T0054 SUMINPUT input="51" result="1326" exit=0
+PASS DOS T0055 SUMINPUT input="52" result="1378" exit=0
+PASS DOS T0056 SUMINPUT input="53" result="1431" exit=0
+PASS DOS T0057 SUMINPUT input="54" result="1485" exit=0
+PASS DOS T0058 SUMINPUT input="55" result="1540" exit=0
+PASS DOS T0059 SUMINPUT input="56" result="1596" exit=0
+PASS DOS T0060 SUMINPUT input="57" result="1653" exit=0
+PASS DOS T0061 SUMINPUT input="58" result="1711" exit=0
+PASS DOS T0062 SUMINPUT input="59" result="1770" exit=0
+PASS DOS T0063 SUMINPUT input="60" result="1830" exit=0
+PASS DOS T0064 SUMINPUT input="61" result="1891" exit=0
+PASS DOS T0065 SUMINPUT input="62" result="1953" exit=0
+PASS DOS T0066 SUMINPUT input="63" result="2016" exit=0
+PASS DOS T0067 SUMINPUT input="64" result="2080" exit=0
+PASS DOS T0068 SUMINPUT input="65" result="2145" exit=0
+PASS DOS T0069 SUMINPUT input="66" result="2211" exit=0
+PASS DOS T0070 SUMINPUT input="67" result="2278" exit=0
+PASS DOS T0071 SUMINPUT input="68" result="2346" exit=0
+PASS DOS T0072 SUMINPUT input="69" result="2415" exit=0
+PASS DOS T0073 SUMINPUT input="70" result="2485" exit=0
+PASS DOS T0074 SUMINPUT input="71" result="2556" exit=0
+PASS DOS T0075 SUMINPUT input="72" result="2628" exit=0
+PASS DOS T0076 SUMINPUT input="73" result="2701" exit=0
+PASS DOS T0077 SUMINPUT input="74" result="2775" exit=0
+PASS DOS T0078 SUMINPUT input="75" result="2850" exit=0
+PASS DOS T0079 SUMINPUT input="76" result="2926" exit=0
+PASS DOS T0080 SUMINPUT input="77" result="3003" exit=0
+PASS DOS T0081 SUMINPUT input="78" result="3081" exit=0
+PASS DOS T0082 SUMINPUT input="79" result="3160" exit=0
+PASS DOS T0083 SUMINPUT input="80" result="3240" exit=0
+PASS DOS T0084 SUMINPUT input="81" result="3321" exit=0
+PASS DOS T0085 SUMINPUT input="82" result="3403" exit=0
+PASS DOS T0086 SUMINPUT input="83" result="3486" exit=0
+PASS DOS T0087 SUMINPUT input="84" result="3570" exit=0
+PASS DOS T0088 SUMINPUT input="85" result="3655" exit=0
+PASS DOS T0089 SUMINPUT input="86" result="3741" exit=0
+PASS DOS T0090 SUMINPUT input="87" result="3828" exit=0
+PASS DOS T0091 SUMINPUT input="88" result="3916" exit=0
+PASS DOS T0092 SUMINPUT input="89" result="4005" exit=0
+PASS DOS T0093 SUMINPUT input="90" result="4095" exit=0
+PASS DOS T0094 SUMINPUT input="91" result="4186" exit=0
+PASS DOS T0095 SUMINPUT input="92" result="4278" exit=0
+PASS DOS T0096 SUMINPUT input="93" result="4371" exit=0
+PASS DOS T0097 SUMINPUT input="94" result="4465" exit=0
+PASS DOS T0098 SUMINPUT input="95" result="4560" exit=0
+PASS DOS T0099 SUMINPUT input="96" result="4656" exit=0
+PASS DOS T0100 SUMINPUT input="97" result="4753" exit=0
+PASS DOS T0101 SUMINPUT input="98" result="4851" exit=0
+PASS DOS T0102 SUMINPUT input="99" result="4950" exit=0
+PASS DOS T0103 SUMINPUT input="100" result="5050" exit=0
+PASS DOS T0104 SUMINPUT input="001" result="1" exit=0
+PASS DOS T0105 SUMINPUT input="010" result="55" exit=0
+PASS DOS T0106 SUMINPUT input="099" result="4950" exit=0
+PASS DOS T0107 SUMINPUT input="" result="" exit=1
+PASS DOS T0108 SUMINPUT input="0" result="" exit=1
+PASS DOS T0109 SUMINPUT input="000" result="" exit=1
+PASS DOS T0110 SUMINPUT input="101" result="" exit=1
+PASS DOS T0111 SUMINPUT input="999" result="" exit=1
+PASS DOS T0112 SUMINPUT input="1000" result="" exit=1
+PASS DOS T0113 SUMINPUT input="-1" result="" exit=1
+PASS DOS T0114 SUMINPUT input="+1" result="" exit=1
+PASS DOS T0115 SUMINPUT input="1.5" result="" exit=1
+PASS DOS T0116 SUMINPUT input="1a" result="" exit=1
+PASS DOS T0117 SUMINPUT input=" 1" result="" exit=1
+PASS DOS T0118 SUMINPUT input="1 " result="" exit=1
+PASS DOS T0119 SUMINPUT input="0001" result="" exit=1
+PASS DOS T0120 SUMINPUT input="999999999999999999999999999999999999999999999999999999999999999" result="" exit=1
+PASS C T0004 input="1" result="1" exit=0
+PASS C T0005 input="2" result="3" exit=0
+PASS C T0006 input="3" result="6" exit=0
+PASS C T0007 input="4" result="10" exit=0
+PASS C T0008 input="5" result="15" exit=0
+PASS C T0009 input="6" result="21" exit=0
+PASS C T0010 input="7" result="28" exit=0
+PASS C T0011 input="8" result="36" exit=0
+PASS C T0012 input="9" result="45" exit=0
+PASS C T0013 input="10" result="55" exit=0
+PASS C T0014 input="11" result="66" exit=0
+PASS C T0015 input="12" result="78" exit=0
+PASS C T0016 input="13" result="91" exit=0
+PASS C T0017 input="14" result="105" exit=0
+PASS C T0018 input="15" result="120" exit=0
+PASS C T0019 input="16" result="136" exit=0
+PASS C T0020 input="17" result="153" exit=0
+PASS C T0021 input="18" result="171" exit=0
+PASS C T0022 input="19" result="190" exit=0
+PASS C T0023 input="20" result="210" exit=0
+PASS C T0024 input="21" result="231" exit=0
+PASS C T0025 input="22" result="253" exit=0
+PASS C T0026 input="23" result="276" exit=0
+PASS C T0027 input="24" result="300" exit=0
+PASS C T0028 input="25" result="325" exit=0
+PASS C T0029 input="26" result="351" exit=0
+PASS C T0030 input="27" result="378" exit=0
+PASS C T0031 input="28" result="406" exit=0
+PASS C T0032 input="29" result="435" exit=0
+PASS C T0033 input="30" result="465" exit=0
+PASS C T0034 input="31" result="496" exit=0
+PASS C T0035 input="32" result="528" exit=0
+PASS C T0036 input="33" result="561" exit=0
+PASS C T0037 input="34" result="595" exit=0
+PASS C T0038 input="35" result="630" exit=0
+PASS C T0039 input="36" result="666" exit=0
+PASS C T0040 input="37" result="703" exit=0
+PASS C T0041 input="38" result="741" exit=0
+PASS C T0042 input="39" result="780" exit=0
+PASS C T0043 input="40" result="820" exit=0
+PASS C T0044 input="41" result="861" exit=0
+PASS C T0045 input="42" result="903" exit=0
+PASS C T0046 input="43" result="946" exit=0
+PASS C T0047 input="44" result="990" exit=0
+PASS C T0048 input="45" result="1035" exit=0
+PASS C T0049 input="46" result="1081" exit=0
+PASS C T0050 input="47" result="1128" exit=0
+PASS C T0051 input="48" result="1176" exit=0
+PASS C T0052 input="49" result="1225" exit=0
+PASS C T0053 input="50" result="1275" exit=0
+PASS C T0054 input="51" result="1326" exit=0
+PASS C T0055 input="52" result="1378" exit=0
+PASS C T0056 input="53" result="1431" exit=0
+PASS C T0057 input="54" result="1485" exit=0
+PASS C T0058 input="55" result="1540" exit=0
+PASS C T0059 input="56" result="1596" exit=0
+PASS C T0060 input="57" result="1653" exit=0
+PASS C T0061 input="58" result="1711" exit=0
+PASS C T0062 input="59" result="1770" exit=0
+PASS C T0063 input="60" result="1830" exit=0
+PASS C T0064 input="61" result="1891" exit=0
+PASS C T0065 input="62" result="1953" exit=0
+PASS C T0066 input="63" result="2016" exit=0
+PASS C T0067 input="64" result="2080" exit=0
+PASS C T0068 input="65" result="2145" exit=0
+PASS C T0069 input="66" result="2211" exit=0
+PASS C T0070 input="67" result="2278" exit=0
+PASS C T0071 input="68" result="2346" exit=0
+PASS C T0072 input="69" result="2415" exit=0
+PASS C T0073 input="70" result="2485" exit=0
+PASS C T0074 input="71" result="2556" exit=0
+PASS C T0075 input="72" result="2628" exit=0
+PASS C T0076 input="73" result="2701" exit=0
+PASS C T0077 input="74" result="2775" exit=0
+PASS C T0078 input="75" result="2850" exit=0
+PASS C T0079 input="76" result="2926" exit=0
+PASS C T0080 input="77" result="3003" exit=0
+PASS C T0081 input="78" result="3081" exit=0
+PASS C T0082 input="79" result="3160" exit=0
+PASS C T0083 input="80" result="3240" exit=0
+PASS C T0084 input="81" result="3321" exit=0
+PASS C T0085 input="82" result="3403" exit=0
+PASS C T0086 input="83" result="3486" exit=0
+PASS C T0087 input="84" result="3570" exit=0
+PASS C T0088 input="85" result="3655" exit=0
+PASS C T0089 input="86" result="3741" exit=0
+PASS C T0090 input="87" result="3828" exit=0
+PASS C T0091 input="88" result="3916" exit=0
+PASS C T0092 input="89" result="4005" exit=0
+PASS C T0093 input="90" result="4095" exit=0
+PASS C T0094 input="91" result="4186" exit=0
+PASS C T0095 input="92" result="4278" exit=0
+PASS C T0096 input="93" result="4371" exit=0
+PASS C T0097 input="94" result="4465" exit=0
+PASS C T0098 input="95" result="4560" exit=0
+PASS C T0099 input="96" result="4656" exit=0
+PASS C T0100 input="97" result="4753" exit=0
+PASS C T0101 input="98" result="4851" exit=0
+PASS C T0102 input="99" result="4950" exit=0
+PASS C T0103 input="100" result="5050" exit=0
+PASS C T0104 input="001" result="1" exit=0
+PASS C T0105 input="010" result="55" exit=0
+PASS C T0106 input="099" result="4950" exit=0
+PASS C T0107 input="" result="" exit=1
+PASS C T0108 input="0" result="" exit=1
+PASS C T0109 input="000" result="" exit=1
+PASS C T0110 input="101" result="" exit=1
+PASS C T0111 input="999" result="" exit=1
+PASS C T0112 input="1000" result="" exit=1
+PASS C T0113 input="-1" result="" exit=1
+PASS C T0114 input="+1" result="" exit=1
+PASS C T0115 input="1.5" result="" exit=1
+PASS C T0116 input="1a" result="" exit=1
+PASS C T0117 input=" 1" result="" exit=1
+PASS C T0118 input="1 " result="" exit=1
+PASS C T0119 input="0001" result="" exit=1
+PASS C T0120 input="999999999999999999999999999999999999999999999999999999999999999" result="" exit=1
+PASS homework03: 120 DOS cases, 117 C cases; exact output and exit codes verified.

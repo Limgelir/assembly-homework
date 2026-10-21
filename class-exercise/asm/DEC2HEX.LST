@@ -1,0 +1,206 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:58:26
+                                                             Page     1-1
+
+
+				; Extra classroom exercise: unsigned decimal 0.
+				.65535 -> hexadecimal. 
+				.model small 
+ 0100				.stack 100h 
+ 0000				.data 
+ 0000  50 6C 65 61 73 65 20	prompt db 'Please input a Dec number (0-65535):
+				',13,10,'$' 
+       69 6E 70 75 74 20 61	
+       20 44 65 63 20 6E 75	
+       6D 62 65 72 20 28 30	
+       2D 36 35 35 33 35 29	
+       3A 0D 0A 24		
+ 0027  54 68 65 20 48 65 78	answer db 'The Hex number:',13,10,'$' 
+       20 6E 75 6D 62 65 72	
+       3A 0D 0A 24		
+ 0039  45 72 72 6F 72 3A 20	error_msg db 'Error: enter 1-5 decimal digits i
+				n 0..65535.',13,10,'$' 
+       65 6E 74 65 72 20 31	
+       2D 35 20 64 65 63 69	
+       6D 61 6C 20 64 69 67	
+       69 74 73 20 69 6E 20	
+       30 2E 2E 36 35 35 33	
+       35 2E 0D 0A 24		
+ 0068  40 00			input_buf db 64,0,64 dup (0) 
+       0040[			
+	   00			
+			 ]	
+				
+ 0000				.code 
+ 0000				start: 
+ 0000  B8 ---- R		    mov ax,@data 
+ 0003  8E D8			    mov ds,ax 
+ 0005  8D 16 0000 R		    lea dx,prompt 
+ 0009  E8 009B R		    call puts 
+ 000C  8D 16 0068 R		    lea dx,input_buf 
+ 0010  B4 0A			    mov ah,0ah 
+ 0012  CD 21			    int 21h 
+ 0014  E8 00A2 R		    call newline 
+ 0017  33 C9			    xor cx,cx 
+ 0019  8A 0E 0069 R		    mov cl,input_buf[1] 
+ 001D  E3 08			    jcxz bad_input 
+ 001F  80 F9 05			    cmp cl,5 
+ 0022  77 03			    ja bad_input 
+ 0024  EB 0D 90			    jmp parse_start 
+ 0027				bad_input: 
+ 0027  8D 16 0039 R		    lea dx,error_msg 
+ 002B  E8 009B R		    call puts 
+ 002E  B8 4C01			    mov ax,4c01h 
+ 0031  CD 21			    int 21h 
+ 0033				parse_start: 
+ 0033  8D 36 006A R		    lea si,input_buf[2] 
+ 0037  33 C0			    xor ax,ax 
+ 0039  BB 000A			    mov bx,10 
+ 003C				parse_digit: 
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:58:26
+                                                             Page     1-2
+
+
+ 003C  8A 14			    mov dl,[si] 
+ 003E  80 FA 30			    cmp dl,'0' 
+ 0041  72 E4			    jb bad_input 
+ 0043  80 FA 39			    cmp dl,'9' 
+ 0046  77 DF			    ja bad_input 
+ 0048  80 EA 30			    sub dl,'0' 
+ 004B  32 F6			    xor dh,dh 
+ 004D  8B FA			    mov di,dx                 ; Preserve digit 
+				across MUL (overwrites DX). 
+ 004F  F7 E3			    mul bx                    ; Unsigned DX:AX 
+				= previous value * 10. 
+ 0051  0B D2			    or dx,dx 
+ 0053  75 D2			    jnz bad_input             ; Reject overflow
+				, e.g. 99999. 
+ 0055  03 C7			    add ax,di 
+ 0057  72 CE			    jc bad_input              ; Reject overflow
+				, e.g. 65536. 
+ 0059  46			    inc si 
+ 005A  E2 E0			    loop parse_digit 
+ 005C  8D 16 0027 R		    lea dx,answer 
+ 0060  E8 009B R		    call puts 
+ 0063  E8 006E R		    call print_hex 
+ 0066  E8 00A2 R		    call newline 
+ 0069  B8 4C00			    mov ax,4c00h 
+ 006C  CD 21			    int 21h 
+				 
+				; Print unsigned AX in uppercase hex, no prefix
+				 or unnecessary leading zero. 
+ 006E				print_hex proc near 
+ 006E  50			    push ax 
+ 006F  53			    push bx 
+ 0070  51			    push cx 
+ 0071  52			    push dx 
+ 0072  BB 0010			    mov bx,16 
+ 0075  33 C9			    xor cx,cx 
+ 0077				hex_split: 
+ 0077  33 D2			    xor dx,dx 
+ 0079  F7 F3			    div bx 
+ 007B  52			    push dx 
+ 007C  41			    inc cx 
+ 007D  0B C0			    or ax,ax 
+ 007F  75 F6			    jnz hex_split 
+ 0081				hex_write: 
+ 0081  5A			    pop dx 
+ 0082  80 FA 09			    cmp dl,9 
+ 0085  76 06			    jbe hex_numeric 
+ 0087  80 C2 37			    add dl,'A'-10 
+ 008A  EB 04 90			    jmp hex_output 
+ 008D				hex_numeric: 
+ 008D  80 C2 30			    add dl,'0' 
+ 0090				hex_output: 
+ 0090  B4 02			    mov ah,02h 
+ 0092  CD 21			    int 21h 
+ 0094  E2 EB			    loop hex_write 
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:58:26
+                                                             Page     1-3
+
+
+ 0096  5A			    pop dx 
+ 0097  59			    pop cx 
+ 0098  5B			    pop bx 
+ 0099  58			    pop ax 
+ 009A  C3			    ret 
+ 009B				print_hex endp 
+				 
+				; Print the '$'-terminated string at DS:DX; pre
+				serve AX. 
+ 009B				puts proc near 
+ 009B  50			    push ax 
+ 009C  B4 09			    mov ah,09h 
+ 009E  CD 21			    int 21h 
+ 00A0  58			    pop ax 
+ 00A1  C3			    ret 
+ 00A2				puts endp 
+				 
+ 00A2				newline proc near 
+ 00A2  50			    push ax 
+ 00A3  52			    push dx 
+ 00A4  B2 0D			    mov dl,0dh 
+ 00A6  B4 02			    mov ah,02h 
+ 00A8  CD 21			    int 21h 
+ 00AA  B2 0A			    mov dl,0ah 
+ 00AC  B4 02			    mov ah,02h 
+ 00AE  CD 21			    int 21h 
+ 00B0  5A			    pop dx 
+ 00B1  58			    pop ax 
+ 00B2  C3			    ret 
+ 00B3				newline endp 
+				 
+ 00B3				end start 
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:58:26
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	00AA	WORD	PUBLIC	'DATA'
+  STACK  . . . . . . . . . . . .  	0100	PARA	STACK	'STACK'
+_TEXT  . . . . . . . . . . . . .  	00B3	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ANSWER . . . . . . . . . . . . .  	L BYTE	0027	_DATA
+
+BAD_INPUT  . . . . . . . . . . .  	L NEAR	0027	_TEXT
+
+ERROR_MSG  . . . . . . . . . . .  	L BYTE	0039	_DATA
+
+HEX_NUMERIC  . . . . . . . . . .  	L NEAR	008D	_TEXT
+HEX_OUTPUT . . . . . . . . . . .  	L NEAR	0090	_TEXT
+HEX_SPLIT  . . . . . . . . . . .  	L NEAR	0077	_TEXT
+HEX_WRITE  . . . . . . . . . . .  	L NEAR	0081	_TEXT
+
+INPUT_BUF  . . . . . . . . . . .  	L BYTE	0068	_DATA
+
+NEWLINE  . . . . . . . . . . . .  	N PROC	00A2	_TEXT	Length = 0011
+
+PARSE_DIGIT  . . . . . . . . . .  	L NEAR	003C	_TEXT
+PARSE_START  . . . . . . . . . .  	L NEAR	0033	_TEXT
+PRINT_HEX  . . . . . . . . . . .  	N PROC	006E	_TEXT	Length = 002D
+PROMPT . . . . . . . . . . . . .  	L BYTE	0000	_DATA
+PUTS . . . . . . . . . . . . . .  	N PROC	009B	_TEXT	Length = 0007
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	_TEXT
+
+@CODE  . . . . . . . . . . . . .  	TEXT  _TEXT		
+@CODESIZE  . . . . . . . . . . .  	TEXT  0		
+@DATASIZE  . . . . . . . . . . .  	TEXT  0		
+@FILENAME  . . . . . . . . . . .  	TEXT  DEC2HEX		
+
+
+    114 Source  Lines
+    114 Total   Lines
+     29 Symbols
+
+  50996 + 465548 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

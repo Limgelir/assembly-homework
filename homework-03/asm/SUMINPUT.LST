@@ -1,0 +1,212 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:58:24
+                                                             Page     1-1
+
+
+				; Homework 3: read n (1..100), then compute 1+2
+				+...+n. 
+				.model small 
+ 0100				.stack 100h 
+ 0000				.data 
+ 0000  50 6C 65 61 73 65 20	prompt db 'Please input n (1-100):',13,10,'$' 
+       69 6E 70 75 74 20 6E	
+       20 28 31 2D 31 30 30	
+       29 3A 0D 0A 24		
+ 001A  53 75 6D 3A 0D 0A 24	answer db 'Sum:',13,10,'$' 
+ 0021  45 72 72 6F 72 3A 20	error_msg db 'Error: enter 1-3 decimal digits i
+				n 1..100.',13,10,'$' 
+       65 6E 74 65 72 20 31	
+       2D 33 20 64 65 63 69	
+       6D 61 6C 20 64 69 67	
+       69 74 73 20 69 6E 20	
+       31 2E 2E 31 30 30 2E	
+       0D 0A 24			
+ 004E  40 00			input_buf db 64,0,64 dup (0) 
+       0040[			
+	   00			
+			 ]	
+				
+ 0000				.code 
+ 0000				start: 
+ 0000  B8 ---- R		    mov ax,@data 
+ 0003  8E D8			    mov ds,ax 
+ 0005  8D 16 0000 R		    lea dx,prompt 
+ 0009  E8 00A6 R		    call puts 
+ 000C  8D 16 004E R		    lea dx,input_buf 
+ 0010  B4 0A			    mov ah,0ah 
+ 0012  CD 21			    int 21h 
+ 0014  E8 00AD R		    call newline 
+ 0017  33 C9			    xor cx,cx 
+ 0019  8A 0E 004F R		    mov cl,input_buf[1] 
+ 001D  E3 08			    jcxz bad_input 
+ 001F  80 F9 03			    cmp cl,3 
+ 0022  77 03			    ja bad_input 
+ 0024  EB 0D 90			    jmp parse_start 
+ 0027				bad_input: 
+ 0027  8D 16 0021 R		    lea dx,error_msg 
+ 002B  E8 00A6 R		    call puts 
+ 002E  B8 4C01			    mov ax,4c01h 
+ 0031  CD 21			    int 21h 
+ 0033				parse_start: 
+ 0033  8D 36 0050 R		    lea si,input_buf[2] 
+ 0037  33 C0			    xor ax,ax 
+ 0039  BB 000A			    mov bx,10 
+ 003C				parse_digit: 
+ 003C  8A 14			    mov dl,[si] 
+ 003E  80 FA 30			    cmp dl,'0' 
+ 0041  72 E4			    jb bad_input 
+ 0043  80 FA 39			    cmp dl,'9' 
+ 0046  77 DF			    ja bad_input 
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:58:24
+                                                             Page     1-2
+
+
+ 0048  80 EA 30			    sub dl,'0' 
+ 004B  32 F6			    xor dh,dh 
+ 004D  8B FA			    mov di,dx                 ; Preserve digit 
+				across MUL (overwrites DX). 
+ 004F  F7 E3			    mul bx                    ; Unsigned DX:AX 
+				= previous value * 10. 
+ 0051  0B D2			    or dx,dx 
+ 0053  75 D2			    jnz bad_input             ; Reject overflow
+				, e.g. 99999. 
+ 0055  03 C7			    add ax,di 
+ 0057  72 CE			    jc bad_input              ; Reject overflow
+				, e.g. 65536. 
+ 0059  46			    inc si 
+ 005A  E2 E0			    loop parse_digit 
+ 005C  3D 0001			    cmp ax,1 
+ 005F  72 C6			    jb bad_input 
+ 0061  3D 0064			    cmp ax,100 
+ 0064  77 C1			    ja bad_input 
+ 0066  8B C8			    mov cx,ax                 ; Check range bef
+				ore LOOP; n=0 is rejected. 
+ 0068  33 C0			    xor ax,ax 
+ 006A  BB 0001			    mov bx,1 
+ 006D				sum_loop: 
+ 006D  03 C3			    add ax,bx 
+ 006F  43			    inc bx 
+ 0070  E2 FB			    loop sum_loop 
+ 0072				sum_done: 
+ 0072  8D 16 001A R		    lea dx,answer 
+ 0076  E8 00A6 R		    call puts                 ; Preserve AX: AH
+				=09h alone would corrupt sum. 
+ 0079  E8 0084 R		    call print_dec 
+ 007C  E8 00AD R		    call newline 
+ 007F  B8 4C00			    mov ax,4c00h 
+ 0082  CD 21			    int 21h 
+				 
+				; Print unsigned AX (0..65535) in decimal; pres
+				erve AX/BX/CX/DX. 
+ 0084				print_dec proc near 
+ 0084  50			    push ax 
+ 0085  53			    push bx 
+ 0086  51			    push cx 
+ 0087  52			    push dx 
+ 0088  BB 000A			    mov bx,10 
+ 008B  33 C9			    xor cx,cx 
+ 008D				decimal_split: 
+ 008D  33 D2			    xor dx,dx                 ; DIV uses DX:AX,
+				 not AX alone. 
+ 008F  F7 F3			    div bx 
+ 0091  52			    push dx                   ; Save remainder,
+				 least significant first. 
+ 0092  41			    inc cx 
+ 0093  0B C0			    or ax,ax 
+ 0095  75 F6			    jnz decimal_split 
+ 0097				decimal_write: 
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:58:24
+                                                             Page     1-3
+
+
+ 0097  5A			    pop dx                    ; Reverse order g
+				ives most significant first. 
+ 0098  80 C2 30			    add dl,'0' 
+ 009B  B4 02			    mov ah,02h 
+ 009D  CD 21			    int 21h 
+ 009F  E2 F6			    loop decimal_write 
+ 00A1  5A			    pop dx 
+ 00A2  59			    pop cx 
+ 00A3  5B			    pop bx 
+ 00A4  58			    pop ax 
+ 00A5  C3			    ret 
+ 00A6				print_dec endp 
+				 
+				; Print the '$'-terminated string at DS:DX; pre
+				serve AX. 
+ 00A6				puts proc near 
+ 00A6  50			    push ax 
+ 00A7  B4 09			    mov ah,09h 
+ 00A9  CD 21			    int 21h 
+ 00AB  58			    pop ax 
+ 00AC  C3			    ret 
+ 00AD				puts endp 
+				 
+ 00AD				newline proc near 
+ 00AD  50			    push ax 
+ 00AE  52			    push dx 
+ 00AF  B2 0D			    mov dl,0dh 
+ 00B1  B4 02			    mov ah,02h 
+ 00B3  CD 21			    int 21h 
+ 00B5  B2 0A			    mov dl,0ah 
+ 00B7  B4 02			    mov ah,02h 
+ 00B9  CD 21			    int 21h 
+ 00BB  5A			    pop dx 
+ 00BC  58			    pop ax 
+ 00BD  C3			    ret 
+ 00BE				newline endp 
+				 
+ 00BE				end start 
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:58:24
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	0090	WORD	PUBLIC	'DATA'
+  STACK  . . . . . . . . . . . .  	0100	PARA	STACK	'STACK'
+_TEXT  . . . . . . . . . . . . .  	00BE	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ANSWER . . . . . . . . . . . . .  	L BYTE	001A	_DATA
+
+BAD_INPUT  . . . . . . . . . . .  	L NEAR	0027	_TEXT
+
+DECIMAL_SPLIT  . . . . . . . . .  	L NEAR	008D	_TEXT
+DECIMAL_WRITE  . . . . . . . . .  	L NEAR	0097	_TEXT
+
+ERROR_MSG  . . . . . . . . . . .  	L BYTE	0021	_DATA
+
+INPUT_BUF  . . . . . . . . . . .  	L BYTE	004E	_DATA
+
+NEWLINE  . . . . . . . . . . . .  	N PROC	00AD	_TEXT	Length = 0011
+
+PARSE_DIGIT  . . . . . . . . . .  	L NEAR	003C	_TEXT
+PARSE_START  . . . . . . . . . .  	L NEAR	0033	_TEXT
+PRINT_DEC  . . . . . . . . . . .  	N PROC	0084	_TEXT	Length = 0022
+PROMPT . . . . . . . . . . . . .  	L BYTE	0000	_DATA
+PUTS . . . . . . . . . . . . . .  	N PROC	00A6	_TEXT	Length = 0007
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	_TEXT
+SUM_DONE . . . . . . . . . . . .  	L NEAR	0072	_TEXT
+SUM_LOOP . . . . . . . . . . . .  	L NEAR	006D	_TEXT
+
+@CODE  . . . . . . . . . . . . .  	TEXT  _TEXT		
+@CODESIZE  . . . . . . . . . . .  	TEXT  0		
+@DATASIZE  . . . . . . . . . . .  	TEXT  0		
+@FILENAME  . . . . . . . . . . .  	TEXT  SUMINPUT		
+
+
+    120 Source  Lines
+    120 Total   Lines
+     29 Symbols
+
+  50982 + 465562 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

@@ -1,0 +1,3 @@
+Please input n (1-100):
+Sum:
+5050
