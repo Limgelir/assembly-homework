@@ -1,0 +1,4 @@
+PASS ASCIILP (LOOP): a-z exactly once; 2 rows; 13 letters per row; spaces and CRLF correct.
+PASS ASCIIJMP (conditional jumps): a-z exactly once; 2 rows; 13 letters per row; spaces and CRLF correct.
+PASS ASCII_C (C language): a-z exactly once; 2 rows; 13 letters per row; spaces and CRLF correct.
+PASS all three outputs are byte-for-byte identical ASCII text (54 bytes).

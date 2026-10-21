@@ -1,0 +1,33 @@
+-u cs:0000 0034
+073E:0000 B361              MOV     BL,61
+073E:0002 B90200            MOV     CX,0002
+073E:0005 51                PUSH    CX
+073E:0006 B90D00            MOV     CX,000D
+073E:0009 8AD3              MOV     DL,BL
+073E:000B E82200            CALL    0030
+073E:000E FEC3              INC     BL
+073E:0010 49                DEC     CX
+073E:0011 7503              JNZ     0016
+073E:0013 EB08              JMP     001D
+073E:0015 90                NOP
+073E:0016 B220              MOV     DL,20
+073E:0018 E81500            CALL    0030
+073E:001B EBEC              JMP     0009
+073E:001D B20D              MOV     DL,0D
+073E:001F E80E00            CALL    0030
+073E:0022 B20A              MOV     DL,0A
+073E:0024 E80900            CALL    0030
+073E:0027 59                POP     CX
+073E:0028 49                DEC     CX
+073E:0029 75DA              JNZ     0005
+073E:002B B8004C            MOV     AX,4C00
+073E:002E CD21              INT     21
+073E:0030 B402              MOV     AH,02
+073E:0032 CD21              INT     21
+073E:0034 C3                RET
+-g
+a b c d e f g h i j k l m
+n o p q r s t u v w x y z
+
+Program terminated normally (0000)
+-q

@@ -1,8 +1,13 @@
 * text=auto
 *.md text eol=lf
 *.ASM text eol=crlf
+*.BAT text eol=crlf
+*.c text eol=lf
+*.ps1 text eol=crlf
 *.TXT text eol=crlf
 *.txt text eol=crlf
 *.LST -text -whitespace
 *.EXE binary
+*.DISASM.txt -text -whitespace
 homework-01/verification/*.txt -text -whitespace
+homework-02/verification/*.txt -text -whitespace

@@ -1,0 +1,93 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:43:23
+                                                             Page     1-1
+
+
+				.model small 
+ 0100				.stack 100h 
+				 
+ 0000				.code 
+ 0000				start: 
+ 0000  B3 61			    mov bl,'a' 
+ 0002  B9 0002			    mov cx,2 
+				 
+ 0005				row_jump: 
+ 0005  51			    push cx                    ; Preserve the o
+				uter counter. 
+ 0006  B9 000D			    mov cx,13 
+				 
+ 0009				column_jump: 
+ 0009  8A D3			    mov dl,bl 
+ 000B  E8 0030 R		    call put_char 
+ 000E  FE C3			    inc bl 
+ 0010  49			    dec cx                     ; DEC sets ZF wh
+				en the result is zero. 
+ 0011  75 03			    jnz column_gap             ; Conditional ju
+				mp replaces the inner LOOP. 
+ 0013  EB 08 90			    jmp row_end 
+				 
+ 0016				column_gap: 
+ 0016  B2 20			    mov dl,' ' 
+ 0018  E8 0030 R		    call put_char 
+ 001B  EB EC			    jmp column_jump 
+				 
+ 001D				row_end: 
+ 001D  B2 0D			    mov dl,0dh 
+ 001F  E8 0030 R		    call put_char 
+ 0022  B2 0A			    mov dl,0ah 
+ 0024  E8 0030 R		    call put_char 
+ 0027  59			    pop cx 
+ 0028  49			    dec cx 
+ 0029  75 DA			    jnz row_jump               ; Conditional ju
+				mp replaces the outer LOOP. 
+				 
+ 002B  B8 4C00			    mov ax,4c00h 
+ 002E  CD 21			    int 21h 
+				 
+ 0030				put_char proc near 
+ 0030  B4 02			    mov ah,02h 
+ 0032  CD 21			    int 21h 
+ 0034  C3			    ret 
+ 0035				put_char endp 
+				 
+ 0035				end start 
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:43:23
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	0000	WORD	PUBLIC	'DATA'
+  STACK  . . . . . . . . . . . .  	0100	PARA	STACK	'STACK'
+_TEXT  . . . . . . . . . . . . .  	0035	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+COLUMN_GAP . . . . . . . . . . .  	L NEAR	0016	_TEXT
+COLUMN_JUMP  . . . . . . . . . .  	L NEAR	0009	_TEXT
+
+PUT_CHAR . . . . . . . . . . . .  	N PROC	0030	_TEXT	Length = 0005
+
+ROW_END  . . . . . . . . . . . .  	L NEAR	001D	_TEXT
+ROW_JUMP . . . . . . . . . . . .  	L NEAR	0005	_TEXT
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	_TEXT
+
+@CODE  . . . . . . . . . . . . .  	TEXT  _TEXT		
+@CODESIZE  . . . . . . . . . . .  	TEXT  0		
+@DATASIZE  . . . . . . . . . . .  	TEXT  0		
+@FILENAME  . . . . . . . . . . .  	TEXT  ASCIIJMP		
+
+
+     44 Source  Lines
+     44 Total   Lines
+     20 Symbols
+
+  51138 + 465406 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

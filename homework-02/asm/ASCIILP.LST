@@ -1,0 +1,95 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:43:22
+                                                             Page     1-1
+
+
+				.model small 
+ 0100				.stack 100h 
+				 
+ 0000				.code 
+ 0000				start: 
+ 0000  B3 61			    mov bl,'a'                 ; Next lowercase
+				 ASCII character. 
+ 0002  B9 0002			    mov cx,2                   ; Two rows. 
+				 
+ 0005				row_loop: 
+ 0005  51			    push cx                    ; Save the OUTER
+				 loop counter. 
+ 0006  B9 000D			    mov cx,13                  ; Thirteen lette
+				rs in this row. 
+				 
+ 0009				column_loop: 
+ 0009  8A D3			    mov dl,bl 
+ 000B  E8 002E R		    call put_char 
+ 000E  FE C3			    inc bl 
+ 0010  E2 03			    loop column_gap            ; Decrement INNE
+				R CX, continue if nonzero. 
+ 0012  EB 08 90			    jmp row_end                ; No trailing sp
+				ace after letter 13. 
+				 
+ 0015				column_gap: 
+ 0015  B2 20			    mov dl,' ' 
+ 0017  E8 002E R		    call put_char 
+ 001A  EB ED			    jmp column_loop 
+				 
+ 001C				row_end: 
+ 001C  B2 0D			    mov dl,0dh                 ; DOS newline: c
+				arriage return + line feed. 
+ 001E  E8 002E R		    call put_char 
+ 0021  B2 0A			    mov dl,0ah 
+ 0023  E8 002E R		    call put_char 
+ 0026  59			    pop cx                     ; Restore the OU
+				TER loop counter. 
+ 0027  E2 DC			    loop row_loop 
+				 
+ 0029  B8 4C00			    mov ax,4c00h 
+ 002C  CD 21			    int 21h 
+				 
+ 002E				put_char proc near 
+ 002E  B4 02			    mov ah,02h                 ; DOS: write the
+				 character in DL. 
+ 0030  CD 21			    int 21h 
+ 0032  C3			    ret 
+ 0033				put_char endp 
+				 
+ 0033				end start 
+Microsoft (R) Macro Assembler Version 5.00                  10/21/26 12:43:22
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	0000	WORD	PUBLIC	'DATA'
+  STACK  . . . . . . . . . . . .  	0100	PARA	STACK	'STACK'
+_TEXT  . . . . . . . . . . . . .  	0033	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+COLUMN_GAP . . . . . . . . . . .  	L NEAR	0015	_TEXT
+COLUMN_LOOP  . . . . . . . . . .  	L NEAR	0009	_TEXT
+
+PUT_CHAR . . . . . . . . . . . .  	N PROC	002E	_TEXT	Length = 0005
+
+ROW_END  . . . . . . . . . . . .  	L NEAR	001C	_TEXT
+ROW_LOOP . . . . . . . . . . . .  	L NEAR	0005	_TEXT
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	_TEXT
+
+@CODE  . . . . . . . . . . . . .  	TEXT  _TEXT		
+@CODESIZE  . . . . . . . . . . .  	TEXT  0		
+@DATASIZE  . . . . . . . . . . .  	TEXT  0		
+@FILENAME  . . . . . . . . . . .  	TEXT  ASCIILP		
+
+
+     42 Source  Lines
+     42 Total   Lines
+     20 Symbols
+
+  51152 + 465392 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
