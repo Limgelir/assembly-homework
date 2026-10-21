@@ -1,0 +1,23 @@
+-e cs:0200 48 65 6c 6c 6f 20 77 6f 72 6c 64 21 0d 0a 24
+-e cs:0100 8c c8 8e d8 ba 00 02 b4 09 cd 21 b8 00 4c cd 21
+-d cs:0200 020e
+0724:0200  48 65 6C 6C 6F 20 77 6F-72 6C 64 21 0D 0A 24    Hello world!..$
+-u cs:0100 010f
+0724:0100 8CC8              MOV     AX,CS
+0724:0102 8ED8              MOV     DS,AX
+0724:0104 BA0002            MOV     DX,0200
+0724:0107 B409              MOV     AH,09
+0724:0109 CD21              INT     21
+0724:010B B8004C            MOV     AX,4C00
+0724:010E CD21              INT     21
+-r ip
+IP 0100  :0100
+-r
+AX=0000 BX=0000 CX=0000 DX=0000 SP=FFFE BP=0000 SI=0000 DI=0000 
+DS=0724 ES=0724 SS=0724 CS=0724 IP=0100 NV UP EI PL NZ NA PO NC 
+0724:0100 8CC8              MOV     AX,CS
+-g
+Hello world!
+
+Program terminated normally (0000)
+-q

@@ -1,0 +1,10 @@
+*.OBJ
+*.obj
+*.CRF
+*.crf
+*.MAP
+*.map
+*.BAK
+*.bak
+Thumbs.db
+.DS_Store

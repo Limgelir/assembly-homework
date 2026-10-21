@@ -1,0 +1,8 @@
+* text=auto
+*.md text eol=lf
+*.ASM text eol=crlf
+*.TXT text eol=crlf
+*.txt text eol=crlf
+*.LST -text -whitespace
+*.EXE binary
+homework-01/verification/*.txt -text -whitespace
