@@ -86,14 +86,30 @@ if (Test-Path -LiteralPath (Join-Path $work 'FAILED.TXT')) {
 
 $cOutput = Join-Path $work 'c.txt'
 $cError = Join-Path $work 'c-error.txt'
-$cProcess = Start-Process -FilePath (Join-Path $taskRoot 'c\ASCII_C.EXE') `
-    -WorkingDirectory $work -WindowStyle Hidden -PassThru `
-    -RedirectStandardOutput $cOutput -RedirectStandardError $cError
-if (-not $cProcess.WaitForExit(15000)) {
-    Stop-Process -Id $cProcess.Id
-    throw 'The C program timed out.'
+# Keep the process handle: Windows PowerShell's Start-Process may lose
+# ExitCode when a redirected console program exits immediately.
+$cProcess = New-Object System.Diagnostics.Process
+$cProcess.StartInfo.FileName = Join-Path $taskRoot 'c\ASCII_C.EXE'
+$cProcess.StartInfo.WorkingDirectory = $work
+$cProcess.StartInfo.UseShellExecute = $false
+$cProcess.StartInfo.CreateNoWindow = $true
+$cProcess.StartInfo.RedirectStandardOutput = $true
+$cProcess.StartInfo.RedirectStandardError = $true
+try {
+    if (-not $cProcess.Start()) { throw 'Could not start the C program.' }
+    $stdoutTask = $cProcess.StandardOutput.ReadToEndAsync()
+    $stderrTask = $cProcess.StandardError.ReadToEndAsync()
+    if (-not $cProcess.WaitForExit(15000)) {
+        $cProcess.Kill()
+        throw 'The C program timed out.'
+    }
+    $cExitCode = $cProcess.ExitCode
+    [System.IO.File]::WriteAllText($cOutput, $stdoutTask.Result, $ascii)
+    [System.IO.File]::WriteAllText($cError, $stderrTask.Result, $ascii)
+} finally {
+    $cProcess.Dispose()
 }
-if ($cProcess.ExitCode -ne 0) { throw 'The C program returned a failure code.' }
+if ($cExitCode -ne 0) { throw 'The C program returned a failure code.' }
 if ((Get-Item -LiteralPath $cError).Length -ne 0) {
     throw 'The C program wrote an error message.'
 }
