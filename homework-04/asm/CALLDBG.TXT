@@ -1,0 +1,13 @@
+u 0 2c
+u 2d 64
+r
+g 19
+t
+d ss:fc l 2
+g 49
+g 60
+g 64
+t
+g 28
+g
+q

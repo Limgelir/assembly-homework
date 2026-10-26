@@ -1,0 +1,6 @@
+PASS DOS: 45 correct products; rows 9..1; 9-column alignment; CRLF; no trailing spaces; exit=0.
+PASS C: 45 correct products; rows 9..1; 9-column alignment; CRLF; no trailing spaces; exit=0.
+PASS DOS and C outputs identical (411 bytes).
+PASS CALL/RET trace: return IP=001C; SP 0100->00FE->00FC->00F4->00FC->00FE->0100; MUL result=9; CX 9->0->9.
+PASS all 45 print_cell calls preserve AX/BX/CX/DX/SP/BP/SI/DI/DS/ES/SS/CS; loop counters correct; final SP=0100.
+PASS homework04: output, multiplication, nested loops, CALL/RET, and register/stack preservation verified.

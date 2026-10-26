@@ -1,0 +1,221 @@
+Microsoft (R) Macro Assembler Version 5.00                  10/26/26 11:51:10
+                                                             Page     1-1
+
+
+				; Homework 4: reverse triangular multiplication
+				 table, 8086 / DOS. 
+				; BH = row (9..1), BL = column (1..row), CX = c
+				urrent loop count. 
+				.model small 
+ 0100				.stack 100h 
+ 0000				.data 
+ 0000  54 68 65 20 39 6D 75	heading db 'The 9mul9 table:',13,10,'$' 
+       6C 39 20 74 61 62 6C	
+       65 3A 0D 0A 24		
+ 0000				.code 
+ 0000				start: 
+ 0000  B8 ---- R		    mov ax,@data 
+ 0003  8E D8			    mov ds,ax 
+ 0005  8D 16 0000 R		    lea dx,heading 
+ 0009  B4 09			    mov ah,09h 
+ 000B  CD 21			    int 21h 
+ 000D  B7 09			    mov bh,9 
+ 000F  B9 0009			    mov cx,9 
+ 0012				row_loop: 
+ 0012  51			    push cx                   ; Save OUTER loop
+				 counter. 
+ 0013  33 C9			    xor cx,cx 
+ 0015  8A CF			    mov cl,bh                 ; INNER loop: row
+				 cells. 
+ 0017  B3 01			    mov bl,1 
+ 0019				column_loop: 
+ 0019  E8 002D R		    call print_cell           ; Callee preserve
+				s main's AX/BX/CX/DX. 
+ 001C				after_cell: 
+ 001C  FE C3			    inc bl 
+ 001E  E2 F9			    loop column_loop 
+ 0020  E8 0094 R		    call newline 
+ 0023  59			    pop cx                    ; Restore OUTER l
+				oop counter. 
+ 0024  FE CF			    dec bh 
+ 0026  E2 EA			    loop row_loop 
+ 0028				table_done: 
+ 0028  B8 4C00			    mov ax,4c00h 
+ 002B  CD 21			    int 21h 
+				 
+				; Input BH=row, BL=column. Print r*c=product, p
+				added to 9 columns 
+				; except at the end of a row. Preserve AX/BX/CX
+				/DX; flags may change. 
+ 002D				print_cell proc near 
+ 002D  50			    push ax 
+ 002E  53			    push bx 
+ 002F  51			    push cx 
+ 0030  52			    push dx 
+ 0031  8A D7			    mov dl,bh 
+ 0033  E8 0065 R		    call print_digit 
+ 0036  B2 2A			    mov dl,'*' 
+ 0038  E8 008D R		    call put_char 
+Microsoft (R) Macro Assembler Version 5.00                  10/26/26 11:51:10
+                                                             Page     1-2
+
+
+ 003B  8A D3			    mov dl,bl 
+ 003D  E8 0065 R		    call print_digit 
+ 0040  B2 3D			    mov dl,'=' 
+ 0042  E8 008D R		    call put_char 
+ 0045  8A C7			    mov al,bh 
+ 0047  F6 E3			    mul bl                    ; 8-bit unsigned 
+				multiply: AX = AL * BL. 
+ 0049				product_ready:                ; 9*1: AX=0009; 9
+				*9: AX=0051. 
+ 0049  E8 006C R		    call print_dec 
+ 004C  3A DF			    cmp bl,bh 
+ 004E  74 10			    je cell_done              ; No trailing spa
+				ces at end of row. 
+ 0050  B9 0004			    mov cx,4                  ; Single-digit pr
+				oduct: 5 chars + 4 spaces. 
+ 0053  3D 000A			    cmp ax,10 
+ 0056  72 01			    jb pad_cell 
+ 0058  49			    dec cx                    ; Two-digit produ
+				ct: 6 chars + 3 spaces. 
+ 0059				pad_cell: 
+ 0059  B2 20			    mov dl,' ' 
+ 005B				pad_loop: 
+ 005B  E8 008D R		    call put_char 
+ 005E  E2 FB			    loop pad_loop             ; Reuses main's C
+				X, saved on entry. 
+ 0060				cell_done: 
+ 0060  5A			    pop dx 
+ 0061  59			    pop cx 
+ 0062  5B			    pop bx 
+ 0063  58			    pop ax 
+ 0064				cell_return: 
+ 0064  C3			    ret                       ; Pop return IP p
+				ushed by near CALL. 
+ 0065				print_cell endp 
+				 
+				; Input DL=0..9; output a digit. Changes DL; pr
+				eserves AX. 
+ 0065				print_digit proc near 
+ 0065  80 C2 30			    add dl,'0' 
+ 0068  E8 008D R		    call put_char 
+ 006B  C3			    ret 
+ 006C				print_digit endp 
+				 
+				; Print unsigned AX in decimal (also handles 0)
+				. Preserve AX/BX/CX/DX. 
+ 006C				print_dec proc near 
+ 006C  50			    push ax 
+ 006D  53			    push bx 
+ 006E  51			    push cx 
+ 006F  52			    push dx 
+ 0070  BB 000A			    mov bx,10 
+ 0073  33 C9			    xor cx,cx 
+ 0075				decimal_split: 
+ 0075  33 D2			    xor dx,dx                 ; DIV uses DX:AX 
+Microsoft (R) Macro Assembler Version 5.00                  10/26/26 11:51:10
+                                                             Page     1-3
+
+
+				as its dividend. 
+ 0077  F7 F3			    div bx 
+ 0079  52			    push dx 
+ 007A  41			    inc cx 
+ 007B  0B C0			    or ax,ax 
+ 007D  75 F6			    jnz decimal_split 
+ 007F				decimal_write: 
+ 007F  5A			    pop dx 
+ 0080  80 C2 30			    add dl,'0' 
+ 0083  E8 008D R		    call put_char 
+ 0086  E2 F7			    loop decimal_write 
+ 0088  5A			    pop dx 
+ 0089  59			    pop cx 
+ 008A  5B			    pop bx 
+ 008B  58			    pop ax 
+ 008C  C3			    ret 
+ 008D				print_dec endp 
+				 
+				; Input DL=character. Preserve AX, so DOS AH=02
+				h cannot destroy product. 
+ 008D				put_char proc near 
+ 008D  50			    push ax 
+ 008E  B4 02			    mov ah,02h 
+ 0090  CD 21			    int 21h 
+ 0092  58			    pop ax 
+ 0093  C3			    ret 
+ 0094				put_char endp 
+				 
+ 0094				newline proc near 
+ 0094  52			    push dx 
+ 0095  B2 0D			    mov dl,13 
+ 0097  E8 008D R		    call put_char 
+ 009A  B2 0A			    mov dl,10 
+ 009C  E8 008D R		    call put_char 
+ 009F  5A			    pop dx 
+ 00A0  C3			    ret 
+ 00A1				newline endp 
+				 
+ 00A1				end start 
+Microsoft (R) Macro Assembler Version 5.00                  10/26/26 11:51:10
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	0013	WORD	PUBLIC	'DATA'
+  STACK  . . . . . . . . . . . .  	0100	PARA	STACK	'STACK'
+_TEXT  . . . . . . . . . . . . .  	00A1	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+AFTER_CELL . . . . . . . . . . .  	L NEAR	001C	_TEXT
+
+CELL_DONE  . . . . . . . . . . .  	L NEAR	0060	_TEXT
+CELL_RETURN  . . . . . . . . . .  	L NEAR	0064	_TEXT
+COLUMN_LOOP  . . . . . . . . . .  	L NEAR	0019	_TEXT
+
+DECIMAL_SPLIT  . . . . . . . . .  	L NEAR	0075	_TEXT
+DECIMAL_WRITE  . . . . . . . . .  	L NEAR	007F	_TEXT
+
+HEADING  . . . . . . . . . . . .  	L BYTE	0000	_DATA
+
+NEWLINE  . . . . . . . . . . . .  	N PROC	0094	_TEXT	Length = 000D
+
+PAD_CELL . . . . . . . . . . . .  	L NEAR	0059	_TEXT
+PAD_LOOP . . . . . . . . . . . .  	L NEAR	005B	_TEXT
+PRINT_CELL . . . . . . . . . . .  	N PROC	002D	_TEXT	Length = 0038
+PRINT_DEC  . . . . . . . . . . .  	N PROC	006C	_TEXT	Length = 0021
+PRINT_DIGIT  . . . . . . . . . .  	N PROC	0065	_TEXT	Length = 0007
+PRODUCT_READY  . . . . . . . . .  	L NEAR	0049	_TEXT
+PUT_CHAR . . . . . . . . . . . .  	N PROC	008D	_TEXT	Length = 0007
+
+ROW_LOOP . . . . . . . . . . . .  	L NEAR	0012	_TEXT
+
+START  . . . . . . . . . . . . .  	L NEAR	0000	_TEXT
+
+TABLE_DONE . . . . . . . . . . .  	L NEAR	0028	_TEXT
+
+@CODE  . . . . . . . . . . . . .  	TEXT  _TEXT		
+@CODESIZE  . . . . . . . . . . .  	TEXT  0		
+@DATASIZE  . . . . . . . . . . .  	TEXT  0		
+@FILENAME  . . . . . . . . . . .  	TEXT  NINE		
+
+Microsoft (R) Macro Assembler Version 5.00                  10/26/26 11:51:10
+                                                             Symbols-2
+
+
+
+    126 Source  Lines
+    126 Total   Lines
+     32 Symbols
+
+  51164 + 465380 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
