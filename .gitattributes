@@ -3,6 +3,7 @@
 *.ASM text eol=crlf
 *.BAT text eol=crlf
 *.c text eol=lf
+*.H text eol=lf
 *.ps1 text eol=crlf
 *.TXT text eol=crlf
 *.txt text eol=crlf
@@ -14,3 +15,5 @@ homework-02/verification/*.txt -text -whitespace
 class-exercise/verification/*.txt -text -whitespace
 homework-03/verification/*.txt -text -whitespace
 homework-04/verification/*.txt -text -whitespace
+homework-04/checker/verification/*.txt -text -whitespace
+*.SYMBOLS.txt -text -whitespace

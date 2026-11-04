@@ -8,7 +8,7 @@ x86 汇编语言课程作业，汇编部分使用 DOSBox 0.74、MASM 5.00、LINK
 | [作业二 ASCII 小写字母表](homework-02/README.md) | LOOP、条件跳转、C 实现；每行 13 个字母；C 反汇编注释 | 三份源码与 EXE、反汇编、实验说明和自动验收脚本 |
 | [课堂练习 进制转换](class-exercise/README.md) | 1～2 位十六进制转十进制；十进制转十六进制 | 两份 ASM / DOS EXE、LST、333 项验收记录 |
 | [作业三 求和](homework-03/README.md) | 1+…+100；寄存器 / 数据段 / 栈；输入 1～100；C 反汇编注释 | 四份 ASM / DOS EXE、C 源码 / EXE、DEBUG 观察、237 项验收记录 |
-| [作业四 九九乘法表](homework-04/README.md) | MUL、CALL/RET、寄存器保存恢复、双循环、C 反汇编注释 | ASM / DOS EXE、C 源码 / EXE、60 条指令注释、45 次过程调用验收 |
+| [作业四 九九乘法表及纠错](homework-04/README.md) | 打印乘法表、扫描 81 字节并定位错误、MUL、CALL/RET、双循环、全局/局部数组对比 | 两部分 ASM / DOS EXE、C 源码 / EXE、反汇编中文注释与自动验收 |
 
 作业按 `homework-01` 至 `homework-04` 目录组织，课堂进制转换练习在 `class-exercise` 目录。
 

@@ -1,0 +1,200 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/4/26 12:53:51
+                                                             Page     1-1
+
+
+				; Homework 4 part 2: check all 81 bytes; report
+				 1-based row/column. 
+ 0000				data segment para public 'DATA' 
+ 0000  07 02 03 04 05 06 07	table db 7,2,3,4,5,6,7,8,9 
+       08 09			
+ 0009  02 04 07 08 0A 0C 0E	      db 2,4,7,8,10,12,14,16,18 
+       10 12			
+ 0012  03 06 09 0C 0F 12 15	      db 3,6,9,12,15,18,21,24,27 
+       18 1B			
+ 001B  04 08 0C 10 07 18 1C	      db 4,8,12,16,7,24,28,32,36 
+       20 24			
+ 0024  05 0A 0F 14 19 1E 23	      db 5,10,15,20,25,30,35,40,45 
+       28 2D			
+ 002D  06 0C 12 18 1E 07 2A	      db 6,12,18,24,30,7,42,48,54 
+       30 36			
+ 0036  07 0E 15 1C 23 2A 31	      db 7,14,21,28,35,42,49,56,63 
+       38 3F			
+ 003F  08 10 18 20 28 30 38	      db 8,16,24,32,40,48,56,7,72 
+       07 48			
+ 0048  09 12 1B 24 2D 36 3F	      db 9,18,27,36,45,54,63,72,81 
+       48 51			
+ 0051  78 20 79 0D 0A 24	heading db 'x y',13,10,'$' 
+ 0057  65 72 72 6F 72 0D 0A	error_text db 'error',13,10,'$' 
+       24			
+ 005F  0D 0A 61 63 63 6F 6D	finished db 13,10,'accomplish!',13,10,'$' 
+       70 6C 69 73 68 21 0D	
+       0A 24			
+ 006F				data ends 
+				 
+ 0000				stack_seg segment para stack 'STACK' 
+ 0000  0080[			    dw 128 dup (?) 
+	   ????			
+			 ]	
+				
+ 0100				stack_seg ends 
+				 
+ 0000				code segment para public 'CODE' 
+				assume cs:code,ds:data,ss:stack_seg 
+ 0000				start: 
+ 0000  B8 ---- R		    mov ax,data 
+ 0003  8E D8			    mov ds,ax 
+ 0005  8D 36 0000 R		    lea si,table 
+ 0009				ready:                        ; DS initialized;
+				 table starts at DS:0000. 
+ 0009  8D 16 0051 R		    lea dx,heading 
+ 000D  B4 09			    mov ah,09h 
+ 000F  CD 21			    int 21h 
+ 0011  B7 01			    mov bh,1                  ; 1-based row. 
+ 0013  B9 0009			    mov cx,9 
+ 0016				row_loop: 
+ 0016  51			    push cx                   ; Save outer coun
+				ter. 
+ 0017  B9 0009			    mov cx,9 
+ 001A  B3 01			    mov bl,1                  ; 1-based column.
+Microsoft (R) Macro Assembler Version 5.00                  11/4/26 12:53:51
+                                                             Page     1-2
+
+
+				 
+ 001C				column_loop: 
+ 001C  E8 0036 R		    call check_cell 
+ 001F				after_cell: 
+ 001F  46			    inc si                    ; Next BYTE; 9 by
+				tes per row, no row padding. 
+ 0020  FE C3			    inc bl 
+ 0022  E2 F8			    loop column_loop 
+ 0024  59			    pop cx 
+ 0025  FE C7			    inc bh 
+ 0027  E2 ED			    loop row_loop 
+ 0029				scan_done: 
+ 0029  8D 16 005F R		    lea dx,finished 
+ 002D  B4 09			    mov ah,09h 
+ 002F  CD 21			    int 21h 
+ 0031  B8 4C00			    mov ax,4c00h               ; Scan completed
+				, even when bad cells exist. 
+ 0034  CD 21			    int 21h 
+				 
+				; Input DS:SI=current byte, BH=row, BL=column. 
+				; Preserve AX/BX/CX/DX/SI; flags may change. Do
+				es not modify the table. 
+ 0036				check_cell proc near 
+ 0036  50			    push ax 
+ 0037  53			    push bx 
+ 0038  51			    push cx 
+ 0039  52			    push dx 
+ 003A  56			    push si 
+ 003B  8A C7			    mov al,bh 
+ 003D  F6 E3			    mul bl                    ; AX = row * colu
+				mn, maximum 81. 
+ 003F				compare_cell: 
+ 003F  3A 04			    cmp al,[si]               ; Register-indire
+				ct access through DS:SI. 
+ 0041  74 03			    je cell_done 
+ 0043  E8 004C R		    call report_error 
+ 0046				cell_done: 
+ 0046  5E			    pop si 
+ 0047  5A			    pop dx 
+ 0048  59			    pop cx 
+ 0049  5B			    pop bx 
+ 004A  58			    pop ax 
+ 004B  C3			    ret 
+ 004C				check_cell endp 
+				 
+				; Report BH BL. Borrow CX to output two spaces,
+				 then restore it. 
+ 004C				report_error proc near 
+ 004C  50			    push ax 
+ 004D  51			    push cx 
+ 004E  52			    push dx 
+ 004F  8A D7			    mov dl,bh 
+ 0051  80 C2 30			    add dl,'0' 
+ 0054  E8 007A R		    call put_char 
+Microsoft (R) Macro Assembler Version 5.00                  11/4/26 12:53:51
+                                                             Page     1-3
+
+
+ 0057  B2 20			    mov dl,' ' 
+ 0059  E8 007A R		    call put_char 
+ 005C  8A D3			    mov dl,bl 
+ 005E  80 C2 30			    add dl,'0' 
+ 0061  E8 007A R		    call put_char 
+ 0064  B9 0002			    mov cx,2 
+ 0067  B2 20			    mov dl,' ' 
+ 0069				space_loop: 
+ 0069  E8 007A R		    call put_char 
+ 006C  E2 FB			    loop space_loop 
+ 006E  8D 16 0057 R		    lea dx,error_text 
+ 0072  B4 09			    mov ah,09h 
+ 0074  CD 21			    int 21h 
+ 0076  5A			    pop dx 
+ 0077  59			    pop cx 
+ 0078  58			    pop ax 
+ 0079  C3			    ret 
+ 007A				report_error endp 
+				 
+ 007A				put_char proc near 
+ 007A  50			    push ax 
+ 007B  B4 02			    mov ah,02h 
+ 007D  CD 21			    int 21h 
+ 007F  58			    pop ax 
+ 0080  C3			    ret 
+ 0081				put_char endp 
+ 0081				code ends 
+				end start 
+Microsoft (R) Macro Assembler Version 5.00                  11/4/26 12:53:51
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CODE . . . . . . . . . . . . . .  	0081	PARA	PUBLIC	'CODE'
+DATA . . . . . . . . . . . . . .  	006F	PARA	PUBLIC	'DATA'
+STACK_SEG  . . . . . . . . . . .  	0100	PARA	STACK	'STACK'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+AFTER_CELL . . . . . . . . . . .  	L NEAR	001F	CODE
+
+CELL_DONE  . . . . . . . . . . .  	L NEAR	0046	CODE
+CHECK_CELL . . . . . . . . . . .  	N PROC	0036	CODE	Length = 0016
+COLUMN_LOOP  . . . . . . . . . .  	L NEAR	001C	CODE
+COMPARE_CELL . . . . . . . . . .  	L NEAR	003F	CODE
+
+ERROR_TEXT . . . . . . . . . . .  	L BYTE	0057	DATA
+
+FINISHED . . . . . . . . . . . .  	L BYTE	005F	DATA
+
+HEADING  . . . . . . . . . . . .  	L BYTE	0051	DATA
+
+PUT_CHAR . . . . . . . . . . . .  	N PROC	007A	CODE	Length = 0007
+
+READY  . . . . . . . . . . . . .  	L NEAR	0009	CODE
+REPORT_ERROR . . . . . . . . . .  	N PROC	004C	CODE	Length = 002E
+ROW_LOOP . . . . . . . . . . . .  	L NEAR	0016	CODE
+
+SCAN_DONE  . . . . . . . . . . .  	L NEAR	0029	CODE
+SPACE_LOOP . . . . . . . . . . .  	L NEAR	0069	CODE
+START  . . . . . . . . . . . . .  	L NEAR	0000	CODE
+
+TABLE  . . . . . . . . . . . . .  	L BYTE	0000	DATA
+
+@FILENAME  . . . . . . . . . . .  	TEXT  CHECK		
+
+
+    111 Source  Lines
+    111 Total   Lines
+     22 Symbols
+
+  51132 + 465412 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

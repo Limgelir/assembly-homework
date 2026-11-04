@@ -1,0 +1,19 @@
+u 0 35
+u 36 4b
+g 9
+d ds:0 l 51
+g 1c
+t
+d ss:fc l 2
+g 3f
+t
+g 76
+g 79
+t
+g 4b
+t
+g 29
+r
+d ds:0 l 51
+g
+q

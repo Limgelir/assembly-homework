@@ -1,5 +1,9 @@
 # 作业四：乘法指令和过程调用
 
+2026-11-04 更新：新增 **[第二部分：九九乘法表纠错](checker/README.md)**，包括老师给定的 81 字节数据、错误坐标定位、数据段寻址、嵌套 CALL/RET，以及 C 全局/局部数组的实际反汇编对比。第一部分保留在下面。
+
+第二部分在本机 DOSBox 中进入 `C:\HW04CHK`，运行 `CHECK`；预期错误坐标为 `(1,1)、(2,3)、(4,5)、(6,6)、(8,8)`。根目录的 `homework-04/verify.ps1` 现已同时验收两个部分。
+
 按照题图输出倒三角九九乘法表：行号从 9 递减到 1，第 r 行输出 r×1 到 r×r，共 45 个算式。每个算式调用一次过程，使用实际乘法指令计算，过程内部借用主程序的寄存器并在返回前恢复。
 
 ## 提交材料
@@ -69,13 +73,13 @@ nine
 powershell -NoProfile -ExecutionPolicy Bypass -File .\homework-04\verify.ps1
 ```
 
-成功时显示六行 PASS，最后一行为：
+第一部分成功时显示六行 PASS，其最后一行为：
 
 ```text
 PASS homework04: output, multiplication, nested loops, CALL/RET, and register/stack preservation verified.
 ```
 
-脚本实际执行 DOS 与 C 的 EXE，并进行以下检查：
+之后脚本继续验收第二部分，全部成功后的最后一条结论为 `PASS checker: 3 default programs, 85 DOS + 85 C data fixtures, 81 procedure calls.`。第二部分的检查范围见其说明文档。第一部分实际执行 DOS 与 C 的 EXE，并进行以下检查：
 
 1. 用重复加法独立计算 45 个乘积，核对两版完整输出、行序、列对齐、CRLF、无行尾空格和成功退出码。
 2. 核对两版输出逐字节一致（411 字节）。

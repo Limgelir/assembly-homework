@@ -158,3 +158,6 @@ $reports.Add('PASS homework04: output, multiplication, nested loops, CALL/RET, a
 [IO.File]::WriteAllText((Join-Path $work 'RESULTS.TXT'),($reports -join "`r`n")+"`r`n",$ascii)
 $reports
 Write-Output ('Captured output and DEBUG logs: '+$work)
+
+# Updated homework 4 also includes the 9x9 data-checking exercise.
+& (Join-Path $PSScriptRoot 'checker\verify.ps1') -DosBoxPath $DosBoxPath -DebugPath $DebugPath
