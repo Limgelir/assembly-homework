@@ -17,3 +17,4 @@ homework-03/verification/*.txt -text -whitespace
 homework-04/verification/*.txt -text -whitespace
 homework-04/checker/verification/*.txt -text -whitespace
 *.SYMBOLS.txt -text -whitespace
+homework-05/verification/*.txt -text -whitespace

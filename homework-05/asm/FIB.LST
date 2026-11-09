@@ -1,0 +1,353 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/9/26 23:33:03
+                                                             Page     1-1
+
+
+				; F(n), 1..100: real recursive calls + memoizat
+				ion + 80-bit integers. 
+ 0000				data segment para public 'DATA' 
+ 0000  0005[			memo dw 5 dup (0),1,4 dup (0),495 dup (0) ; 101
+				 numbers, 5 words each. 
+	   0000			
+			 ]	
+       0001			
+       0004[			
+	   0000			
+			 ]	
+       01EF[			
+	   0000			
+			 ]	
+				
+ 03F2  01 01			ready db 1,1,99 dup (0)                  ; F(0)
+				=0 and F(1)=1 cached. 
+       0063[			
+	   00			
+			 ]	
+				
+ 0457  0000			calls dw 0 
+ 0459  1000			min_sp dw 1000h 
+ 045B  0005[			scratch dw 5 dup (0) 
+	   0000			
+			 ]	
+				
+ 0465  50 6C 65 61 73 65 20	prompt db 'Please input n (1-100):',13,10,'$' 
+       69 6E 70 75 74 20 6E	
+       20 28 31 2D 31 30 30	
+       29 3A 0D 0A 24		
+ 047F  46 28 6E 29 3A 0D 0A	answer db 'F(n):',13,10,'$' 
+       24			
+ 0487  45 72 72 6F 72 3A 20	error_msg db 'Error: enter 1-3 decimal digits i
+				n 1..100.',13,10,'$' 
+       65 6E 74 65 72 20 31	
+       2D 33 20 64 65 63 69	
+       6D 61 6C 20 64 69 67	
+       69 74 73 20 69 6E 20	
+       31 2E 2E 31 30 30 2E	
+       0D 0A 24			
+ 04B4  40 00			input_buf db 64,0,64 dup (0) 
+       0040[			
+	   00			
+			 ]	
+				
+ 04F6				data ends 
+ 0000				stack_seg segment para stack 'STACK' 
+ 0000  0800[			    dw 2048 dup (0a55ah)                ; 4096 
+				bytes; DOS loader sets SS:SP. 
+	   A55A			
+			 ]	
+				
+ 1000				stack_seg ends 
+Microsoft (R) Macro Assembler Version 5.00                  11/9/26 23:33:03
+                                                             Page     1-2
+
+
+ 0000				code segment para public 'CODE' 
+				assume cs:code,ds:data,ss:stack_seg 
+ 0000				start: 
+ 0000  B8 ---- R		    mov ax,data 
+ 0003  8E D8			    mov ds,ax 
+ 0005				initialized: 
+ 0005  8D 16 0465 R		    lea dx,prompt 
+ 0009  E8 013B R		    call puts 
+ 000C  8D 16 04B4 R		    lea dx,input_buf 
+ 0010  B4 0A			    mov ah,0ah 
+ 0012  CD 21			    int 21h 
+ 0014  E8 0142 R		    call newline 
+ 0017  33 C9			    xor cx,cx 
+ 0019  8A 0E 04B5 R		    mov cl,input_buf[1] 
+ 001D  E3 08			    jcxz bad_input 
+ 001F  80 F9 03			    cmp cl,3 
+ 0022  77 03			    ja bad_input 
+ 0024  EB 0D 90			    jmp parse_start 
+ 0027				bad_input: 
+ 0027  8D 16 0487 R		    lea dx,error_msg 
+ 002B  E8 013B R		    call puts 
+ 002E  B8 4C01			    mov ax,4c01h 
+ 0031  CD 21			    int 21h 
+ 0033				parse_start: 
+ 0033  8D 36 04B6 R		    lea si,input_buf[2] 
+ 0037  33 C0			    xor ax,ax 
+ 0039  BB 000A			    mov bx,10 
+ 003C				parse_digit: 
+ 003C  8A 14			    mov dl,[si] 
+ 003E  80 FA 30			    cmp dl,'0' 
+ 0041  72 E4			    jb bad_input 
+ 0043  80 FA 39			    cmp dl,'9' 
+ 0046  77 DF			    ja bad_input 
+ 0048  80 EA 30			    sub dl,'0' 
+ 004B  32 F6			    xor dh,dh 
+ 004D  8B FA			    mov di,dx 
+ 004F  F7 E3			    mul bx 
+ 0051  03 C7			    add ax,di                           ; At mo
+				st 3 digits: no 16-bit overflow. 
+ 0053  46			    inc si 
+ 0054  E2 E6			    loop parse_digit 
+ 0056  3D 0001			    cmp ax,1 
+ 0059  72 CC			    jb bad_input 
+ 005B  3D 0064			    cmp ax,100 
+ 005E  77 C7			    ja bad_input 
+ 0060				compute: 
+ 0060  E8 0075 R		    call fib 
+ 0063				computed: 
+ 0063  8D 16 047F R		    lea dx,answer 
+ 0067  E8 013B R		    call puts 
+ 006A  E8 00E0 R		    call print_big 
+ 006D  E8 0142 R		    call newline 
+ 0070  B8 4C00			    mov ax,4c00h 
+ 0073  CD 21			    int 21h 
+Microsoft (R) Macro Assembler Version 5.00                  11/9/26 23:33:03
+                                                             Page     1-3
+
+
+				 
+				; Input AX=n (0..100). Return DS:SI -> memo[n],
+				 5 little-endian words. 
+				; Preserve AX/BX/CX/DX/DI/BP. SI is the return 
+				value; flags may change. 
+ 0075				fib proc near 
+ 0075  55			    push bp 
+ 0076  8B EC			    mov bp,sp 
+ 0078  50			    push ax                            ; Saved 
+				n at SS:[BP-2]. 
+ 0079  53			    push bx 
+ 007A  51			    push cx 
+ 007B  52			    push dx 
+ 007C  57			    push di 
+ 007D				frame_ready:                           ; 14 byt
+				es including near return IP. 
+ 007D  FF 06 0457 R		    inc calls 
+ 0081  3B 26 0459 R		    cmp sp,min_sp 
+ 0085  73 04			    jae depth_recorded 
+ 0087  89 26 0459 R		    mov min_sp,sp 
+ 008B				depth_recorded: 
+ 008B  8B D8			    mov bx,ax 
+ 008D  80 BF 03F2 R 00		    cmp ready[bx],0 
+ 0092  75 37			    jne cached 
+ 0094  48			    dec ax 
+ 0095  E8 0075 R		    call fib                           ; F(n-1)
+				, recursively. 
+ 0098  56			    push si                            ; Keep i
+				ts pointer across next call. 
+ 0099  8B 46 FE			    mov ax,[bp-2] 
+ 009C  2D 0002			    sub ax,2 
+ 009F  E8 0075 R		    call fib                           ; F(n-2)
+				; already cached on unwind. 
+ 00A2  5F			    pop di 
+ 00A3  8B 46 FE			    mov ax,[bp-2] 
+ 00A6  BB 000A			    mov bx,10 
+ 00A9  F7 E3			    mul bx 
+ 00AB  8D 1E 0000 R		    lea bx,memo 
+ 00AF  03 D8			    add bx,ax                          ; Destin
+				ation = memo + n*10. 
+ 00B1  B9 0005			    mov cx,5 
+ 00B4  F8			    clc 
+ 00B5				add_words: 
+ 00B5  8B 05			    mov ax,[di] 
+ 00B7  13 04			    adc ax,[si]                        ; Propag
+				ate carry across all 80 bits. 
+ 00B9  89 07			    mov [bx],ax 
+ 00BB  46			    inc si                             ; INC an
+				d LOOP preserve carry. 
+ 00BC  46			    inc si 
+ 00BD  47			    inc di 
+ 00BE  47			    inc di 
+ 00BF  43			    inc bx 
+ 00C0  43			    inc bx 
+Microsoft (R) Macro Assembler Version 5.00                  11/9/26 23:33:03
+                                                             Page     1-4
+
+
+ 00C1  E2 F2			    loop add_words 
+ 00C3  8B 5E FE			    mov bx,[bp-2] 
+ 00C6  C6 87 03F2 R 01		    mov ready[bx],1 
+ 00CB				cached: 
+ 00CB  8B 46 FE			    mov ax,[bp-2] 
+ 00CE  BB 000A			    mov bx,10 
+ 00D1  F7 E3			    mul bx 
+ 00D3  8D 36 0000 R		    lea si,memo 
+ 00D7  03 F0			    add si,ax 
+ 00D9  5F			    pop di 
+ 00DA  5A			    pop dx 
+ 00DB  59			    pop cx 
+ 00DC  5B			    pop bx 
+ 00DD  58			    pop ax 
+ 00DE  5D			    pop bp 
+ 00DF				return_point: 
+ 00DF  C3			    ret 
+ 00E0				fib endp 
+				 
+				; Print DS:SI 80-bit value; copy it before divi
+				sion, preserving the cache. 
+ 00E0				print_big proc near 
+ 00E0  50			    push ax 
+ 00E1  53			    push bx 
+ 00E2  51			    push cx 
+ 00E3  52			    push dx 
+ 00E4  56			    push si 
+ 00E5  57			    push di 
+ 00E6  8D 3E 045B R		    lea di,scratch 
+ 00EA  B9 0005			    mov cx,5 
+ 00ED				copy_words: 
+ 00ED  8B 04			    mov ax,[si] 
+ 00EF  89 05			    mov [di],ax 
+ 00F1  83 C6 02			    add si,2 
+ 00F4  83 C7 02			    add di,2 
+ 00F7  E2 F4			    loop copy_words 
+ 00F9  33 C9			    xor cx,cx                          ; Decima
+				l digits saved on stack. 
+ 00FB				decimal_pass: 
+ 00FB  8D 36 0463 R		    lea si,scratch+8                   ; Divide
+				 from highest word to lowest. 
+ 00FF  BF 0005			    mov di,5 
+ 0102  BB 000A			    mov bx,10 
+ 0105  33 D2			    xor dx,dx                          ; Carry 
+				remainder between words. 
+ 0107				divide_words: 
+ 0107  8B 04			    mov ax,[si] 
+ 0109  F7 F3			    div bx 
+ 010B  89 04			    mov [si],ax 
+ 010D  83 EE 02			    sub si,2 
+ 0110  4F			    dec di 
+ 0111  75 F4			    jnz divide_words 
+ 0113  52			    push dx                            ; This p
+				ass's decimal remainder. 
+Microsoft (R) Macro Assembler Version 5.00                  11/9/26 23:33:03
+                                                             Page     1-5
+
+
+ 0114  41			    inc cx 
+ 0115  A1 045B R		    mov ax,scratch 
+ 0118  0B 06 045D R		    or ax,scratch[2] 
+ 011C  0B 06 045F R		    or ax,scratch[4] 
+ 0120  0B 06 0461 R		    or ax,scratch[6] 
+ 0124  0B 06 0463 R		    or ax,scratch[8] 
+ 0128  75 D1			    jnz decimal_pass 
+ 012A				write_digits: 
+ 012A  5A			    pop dx 
+ 012B  80 C2 30			    add dl,'0' 
+ 012E  B4 02			    mov ah,02h 
+ 0130  CD 21			    int 21h 
+ 0132  E2 F6			    loop write_digits 
+ 0134  5F			    pop di 
+ 0135  5E			    pop si 
+ 0136  5A			    pop dx 
+ 0137  59			    pop cx 
+ 0138  5B			    pop bx 
+ 0139  58			    pop ax 
+ 013A  C3			    ret 
+ 013B				print_big endp 
+				 
+ 013B				puts proc near 
+ 013B  50			    push ax 
+ 013C  B4 09			    mov ah,09h 
+ 013E  CD 21			    int 21h 
+ 0140  58			    pop ax 
+ 0141  C3			    ret 
+ 0142				puts endp 
+ 0142				newline proc near 
+ 0142  50			    push ax 
+ 0143  52			    push dx 
+ 0144  B2 0D			    mov dl,13 
+ 0146  B4 02			    mov ah,02h 
+ 0148  CD 21			    int 21h 
+ 014A  B2 0A			    mov dl,10 
+ 014C  B4 02			    mov ah,02h 
+ 014E  CD 21			    int 21h 
+ 0150  5A			    pop dx 
+ 0151  58			    pop ax 
+ 0152  C3			    ret 
+ 0153				newline endp 
+ 0153				code ends 
+				end start 
+Microsoft (R) Macro Assembler Version 5.00                  11/9/26 23:33:03
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CODE . . . . . . . . . . . . . .  	0153	PARA	PUBLIC	'CODE'
+DATA . . . . . . . . . . . . . .  	04F6	PARA	PUBLIC	'DATA'
+STACK_SEG  . . . . . . . . . . .  	1000	PARA	STACK	'STACK'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ADD_WORDS  . . . . . . . . . . .  	L NEAR	00B5	CODE
+ANSWER . . . . . . . . . . . . .  	L BYTE	047F	DATA
+
+BAD_INPUT  . . . . . . . . . . .  	L NEAR	0027	CODE
+
+CACHED . . . . . . . . . . . . .  	L NEAR	00CB	CODE
+CALLS  . . . . . . . . . . . . .  	L WORD	0457	DATA
+COMPUTE  . . . . . . . . . . . .  	L NEAR	0060	CODE
+COMPUTED . . . . . . . . . . . .  	L NEAR	0063	CODE
+COPY_WORDS . . . . . . . . . . .  	L NEAR	00ED	CODE
+
+DECIMAL_PASS . . . . . . . . . .  	L NEAR	00FB	CODE
+DEPTH_RECORDED . . . . . . . . .  	L NEAR	008B	CODE
+DIVIDE_WORDS . . . . . . . . . .  	L NEAR	0107	CODE
+
+ERROR_MSG  . . . . . . . . . . .  	L BYTE	0487	DATA
+
+FIB  . . . . . . . . . . . . . .  	N PROC	0075	CODE	Length = 006B
+FRAME_READY  . . . . . . . . . .  	L NEAR	007D	CODE
+
+INITIALIZED  . . . . . . . . . .  	L NEAR	0005	CODE
+INPUT_BUF  . . . . . . . . . . .  	L BYTE	04B4	DATA
+
+MEMO . . . . . . . . . . . . . .  	L WORD	0000	DATA	Length = 0005
+MIN_SP . . . . . . . . . . . . .  	L WORD	0459	DATA
+
+NEWLINE  . . . . . . . . . . . .  	N PROC	0142	CODE	Length = 0011
+
+PARSE_DIGIT  . . . . . . . . . .  	L NEAR	003C	CODE
+PARSE_START  . . . . . . . . . .  	L NEAR	0033	CODE
+PRINT_BIG  . . . . . . . . . . .  	N PROC	00E0	CODE	Length = 005B
+PROMPT . . . . . . . . . . . . .  	L BYTE	0465	DATA
+PUTS . . . . . . . . . . . . . .  	N PROC	013B	CODE	Length = 0007
+
+READY  . . . . . . . . . . . . .  	L BYTE	03F2	DATA
+RETURN_POINT . . . . . . . . . .  	L NEAR	00DF	CODE
+
+SCRATCH  . . . . . . . . . . . .  	L WORD	045B	DATA	Length = 0005
+START  . . . . . . . . . . . . .  	L NEAR	0000	CODE
+
+WRITE_DIGITS . . . . . . . . . .  	L NEAR	012A	CODE
+
+Microsoft (R) Macro Assembler Version 5.00                  11/9/26 23:33:03
+                                                             Symbols-2
+
+
+@FILENAME  . . . . . . . . . . .  	TEXT  FIB		
+
+
+    205 Source  Lines
+    205 Total   Lines
+     35 Symbols
+
+  51070 + 449090 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

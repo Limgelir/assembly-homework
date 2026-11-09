@@ -1,0 +1,803 @@
+g 5
+r ax
+0064
+g =60 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+t
+g 7d df
+g 63
+d ds:457 l 4
+d ss:0 l 20
+g
+q
