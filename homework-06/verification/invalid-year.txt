@@ -1,0 +1,2 @@
+Please input year (1900-2099): 1899
+Error: year must be 1900..2099 (4 digits).

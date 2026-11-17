@@ -1,0 +1,3 @@
+Please input year (1900-2099): 2026
+Please input month (1-12): 0
+Error: month must be 1..12 (1-2 digits).

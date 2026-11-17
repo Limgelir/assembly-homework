@@ -1,0 +1,615 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/17/26 11:44:37
+                                                             Page     1-1
+
+
+				; 8086 monthly calendar. CORE and SCREEN are se
+				parate code segments. 
+ 0000				data segment para public 'DATA' 
+ 0000  07EA			selected_year dw 2026 
+ 0002  000B			selected_month dw 11 
+ 0004  0000			first_day dw 0 
+ 0006  0000			month_length dw 0 
+ 0008  1F 1C 1F 1E 1F 1E 1F	month_days db 31,28,31,30,31,30,31,31,30,31,30,
+				31 
+       1F 1E 1F 1E 1F		
+ 0014  002C R 0034 R 003D R	month_names dw offset m1,offset m2,offset m3,of
+				fset m4,offset m5,offset m6,offset m7,offset m8
+				,offset m9,offset m10,offset m11,offse
+       0043 R 0049 R 004D R	
+       0052 R 0057 R 005E R	
+       0068 R 0070 R 0079 R	
+ 002C  4A 61 6E 75 61 72 79	m1 db 'January$' 
+       24			
+ 0034  46 65 62 72 75 61 72	m2 db 'February$' 
+       79 24			
+ 003D  4D 61 72 63 68 24	m3 db 'March$' 
+ 0043  41 70 72 69 6C 24	m4 db 'April$' 
+ 0049  4D 61 79 24		m5 db 'May$' 
+ 004D  4A 75 6E 65 24		m6 db 'June$' 
+ 0052  4A 75 6C 79 24		m7 db 'July$' 
+ 0057  41 75 67 75 73 74 24	m8 db 'August$' 
+ 005E  53 65 70 74 65 6D 62	m9 db 'September$' 
+       65 72 24			
+ 0068  4F 63 74 6F 62 65 72	m10 db 'October$' 
+       24			
+ 0070  4E 6F 76 65 6D 62 65	m11 db 'November$' 
+       72 24			
+ 0079  44 65 63 65 6D 62 65	m12 db 'December$' 
+       72 24			
+ 0082  50 6C 65 61 73 65 20	year_prompt db 'Please input year (1900-2099): 
+				$' 
+       69 6E 70 75 74 20 79	
+       65 61 72 20 28 31 39	
+       30 30 2D 32 30 39 39	
+       29 3A 20 24		
+ 00A2  50 6C 65 61 73 65 20	month_prompt db 'Please input month (1-12): $' 
+       69 6E 70 75 74 20 6D	
+       6F 6E 74 68 20 28 31	
+       2D 31 32 29 3A 20 24	
+ 00BE  45 72 72 6F 72 3A 20	year_error db 'Error: year must be 1900..2099 (
+				4 digits).',13,10,'$' 
+       79 65 61 72 20 6D 75	
+       73 74 20 62 65 20 31	
+       39 30 30 2E 2E 32 30	
+       39 39 20 28 34 20 64	
+       69 67 69 74 73 29 2E	
+       0D 0A 24			
+ 00EB  45 72 72 6F 72 3A 20	month_error db 'Error: month must be 1..12 (1-2
+				 digits).',13,10,'$' 
+Microsoft (R) Macro Assembler Version 5.00                  11/17/26 11:44:37
+                                                             Page     1-2
+
+
+       6D 6F 6E 74 68 20 6D	
+       75 73 74 20 62 65 20	
+       31 2E 2E 31 32 20 28	
+       31 2D 32 20 64 69 67	
+       69 74 73 29 2E 0D 0A	
+       24			
+ 0116  53 75 20 4D 6F 20 54	weekdays db 'Su Mo Tu We Th Fr Sa',13,10,'$' 
+       75 20 57 65 20 54 68	
+       20 46 72 20 53 61 0D	
+       0A 24			
+ 012D  20 20 24			two_spaces db '  $' 
+ 0130  40 00			input_buf db 64,0,64 dup (0) 
+       0040[			
+	   00			
+			 ]	
+				
+ 0172				data ends 
+ 0000				stack_seg segment para stack 'STACK' 
+ 0000  0200[			    dw 512 dup (0a55ah) 
+	   A55A			
+			 ]	
+				
+ 0400				stack_seg ends 
+				 
+ 0000				core segment para public 'CODE' 
+				assume cs:core,ds:data,ss:stack_seg 
+ 0000				start: 
+ 0000  B8 ---- R		    mov ax,data 
+ 0003  8E D8			    mov ds,ax 
+ 0005  8D 16 0082 R		    lea dx,year_prompt 
+ 0009  9A 00B9 ---- R		    call far ptr write_string 
+ 000E  B1 04			    mov cl,4 
+ 0010  E8 0076 R		    call read_number 
+ 0013  73 03			    jnc short year_parsed 
+ 0015  E9 0177 R		    jmp near ptr bad_year              ; Condit
+				ional target may exceed 127. 
+ 0018				year_parsed: 
+ 0018  3D 076C			    cmp ax,1900 
+ 001B  73 03			    jae short year_min_ok 
+ 001D  E9 0177 R		    jmp near ptr bad_year 
+ 0020				year_min_ok: 
+ 0020  3D 0833			    cmp ax,2099 
+ 0023  76 03			    jbe short year_ok 
+ 0025  E9 0177 R		    jmp near ptr bad_year 
+ 0028				year_ok: 
+ 0028  A3 0000 R		    mov selected_year,ax 
+ 002B  8D 16 00A2 R		    lea dx,month_prompt 
+ 002F  9A 00B9 ---- R		    call far ptr write_string 
+ 0034  B1 02			    mov cl,2 
+ 0036  E8 0076 R		    call read_number 
+ 0039  73 03			    jnc short month_parsed 
+ 003B  E9 0185 R		    jmp near ptr bad_month 
+ 003E				month_parsed: 
+ 003E  3D 0001			    cmp ax,1 
+Microsoft (R) Macro Assembler Version 5.00                  11/17/26 11:44:37
+                                                             Page     1-3
+
+
+ 0041  73 03			    jae short month_min_ok 
+ 0043  E9 0185 R		    jmp near ptr bad_month 
+ 0046				month_min_ok: 
+ 0046  3D 000C			    cmp ax,12 
+ 0049  76 03			    jbe short month_ok 
+ 004B  E9 0185 R		    jmp near ptr bad_month 
+ 004E				month_ok: 
+ 004E  A3 0002 R		    mov selected_month,ax 
+ 0051				calculate: 
+ 0051  A1 0000 R		    mov ax,selected_year 
+ 0054  8B 1E 0002 R		    mov bx,selected_month 
+ 0058  E8 0106 R		    call days_in_month                 ; Regist
+				er arguments AX/BX -> AX. 
+ 005B  A3 0006 R		    mov month_length,ax 
+ 005E  FF 36 0002 R		    push selected_month 
+ 0062  FF 36 0000 R		    push selected_year 
+ 0066				before_weekday: 
+ 0066  E8 011F R		    call first_weekday                 ; Stack 
+				arguments, callee RET 4. 
+ 0069				after_weekday: 
+ 0069  A3 0004 R		    mov first_day,ax 
+ 006C				before_render: 
+ 006C  9A 0000 ---- R		    call far ptr render_calendar       ; Data-s
+				egment arguments; changes CS. 
+ 0071				after_render: 
+ 0071  B8 4C00			    mov ax,4c00h 
+ 0074  CD 21			    int 21h 
+				 
+				; CL=max digits. Return AX=value, CF=0; CF=1 fo
+				r invalid input. 
+ 0076				read_number proc near 
+ 0076  53			    push bx 
+ 0077  51			    push cx 
+ 0078  52			    push dx 
+ 0079  56			    push si 
+ 007A  57			    push di 
+ 007B  8A D9			    mov bl,cl 
+ 007D  C6 06 0131 R 00		    mov input_buf[1],0 
+ 0082  8D 16 0130 R		    lea dx,input_buf 
+ 0086  B4 0A			    mov ah,0ah 
+ 0088  CD 21			    int 21h 
+ 008A  9A 00C0 ---- R		    call far ptr crlf 
+ 008F  33 C9			    xor cx,cx 
+ 0091  8A 0E 0131 R		    mov cl,input_buf[1] 
+ 0095  8D 36 0132 R		    lea si,input_buf[2] 
+ 0099  E3 2F			    jcxz read_bad 
+ 009B  80 3C 0A			    cmp byte ptr [si],10                ; CRLF 
+				files leave LF after prior CR. 
+ 009E  75 04			    jne length_ready 
+ 00A0  46			    inc si 
+ 00A1  49			    dec cx 
+ 00A2  E3 26			    jcxz read_bad 
+ 00A4				length_ready: 
+ 00A4  3A CB			    cmp cl,bl 
+Microsoft (R) Macro Assembler Version 5.00                  11/17/26 11:44:37
+                                                             Page     1-4
+
+
+ 00A6  77 22			    ja read_bad 
+ 00A8  33 C0			    xor ax,ax 
+ 00AA  BB 000A			    mov bx,10 
+ 00AD				read_digit: 
+ 00AD  8A 14			    mov dl,[si] 
+ 00AF  80 FA 30			    cmp dl,'0' 
+ 00B2  72 16			    jb read_bad 
+ 00B4  80 FA 39			    cmp dl,'9' 
+ 00B7  77 11			    ja read_bad 
+ 00B9  80 EA 30			    sub dl,'0' 
+ 00BC  32 F6			    xor dh,dh 
+ 00BE  8B FA			    mov di,dx 
+ 00C0  F7 E3			    mul bx 
+ 00C2  03 C7			    add ax,di                          ; At mos
+				t 4 digits, no overflow. 
+ 00C4  46			    inc si 
+ 00C5  E2 E6			    loop read_digit 
+ 00C7  F8			    clc 
+ 00C8  EB 01			    jmp short read_end 
+ 00CA				read_bad: 
+ 00CA  F9			    stc 
+ 00CB				read_end: 
+ 00CB  5F			    pop di 
+ 00CC  5E			    pop si 
+ 00CD  5A			    pop dx 
+ 00CE  59			    pop cx 
+ 00CF  5B			    pop bx 
+ 00D0  C3			    ret 
+ 00D1				read_number endp 
+				 
+				; Register argument AX=year -> AX=0/1; preserve
+				 BX/CX/DX. 
+ 00D1				leap_year proc near 
+ 00D1  53			    push bx 
+ 00D2  51			    push cx 
+ 00D3  52			    push dx 
+ 00D4  8B C8			    mov cx,ax 
+ 00D6  BB 0004			    mov bx,4 
+ 00D9  33 D2			    xor dx,dx 
+ 00DB  F7 F3			    div bx 
+ 00DD  0B D2			    or dx,dx 
+ 00DF  75 1F			    jnz not_leap 
+ 00E1  8B C1			    mov ax,cx 
+ 00E3  BB 0064			    mov bx,100 
+ 00E6  33 D2			    xor dx,dx 
+ 00E8  F7 F3			    div bx 
+ 00EA  0B D2			    or dx,dx 
+ 00EC  75 0D			    jnz is_leap 
+ 00EE  8B C1			    mov ax,cx 
+ 00F0  BB 0190			    mov bx,400 
+ 00F3  33 D2			    xor dx,dx 
+ 00F5  F7 F3			    div bx 
+ 00F7  0B D2			    or dx,dx 
+ 00F9  75 05			    jnz not_leap 
+Microsoft (R) Macro Assembler Version 5.00                  11/17/26 11:44:37
+                                                             Page     1-5
+
+
+ 00FB				is_leap: 
+ 00FB  B8 0001			    mov ax,1 
+ 00FE  EB 02			    jmp short leap_end 
+ 0100				not_leap: 
+ 0100  33 C0			    xor ax,ax 
+ 0102				leap_end: 
+ 0102  5A			    pop dx 
+ 0103  59			    pop cx 
+ 0104  5B			    pop bx 
+ 0105  C3			    ret 
+ 0106				leap_year endp 
+				 
+				; AX=year, BX=month (1..12) -> AX=28..31. Other
+				 registers preserved. 
+ 0106				days_in_month proc near 
+ 0106  56			    push si 
+ 0107  83 FB 02			    cmp bx,2 
+ 010A  75 08			    jne ordinary_month 
+ 010C  E8 00D1 R		    call leap_year 
+ 010F  05 001C			    add ax,28 
+ 0112  EB 09			    jmp short days_end 
+ 0114				ordinary_month: 
+ 0114  8B F3			    mov si,bx 
+ 0116  4E			    dec si 
+ 0117  33 C0			    xor ax,ax 
+ 0119  8A 84 0008 R		    mov al,month_days[si] 
+ 011D				days_end: 
+ 011D  5E			    pop si 
+ 011E  C3			    ret 
+ 011F				days_in_month endp 
+				 
+				; Caller pushes month, then year. AX=weekday, S
+				unday=0. 
+				; [BP+4]=year, [BP+6]=month; RET 4 removes the 
+				two arguments. 
+ 011F				first_weekday proc near 
+ 011F  55			    push bp 
+ 0120  8B EC			    mov bp,sp 
+ 0122  53			    push bx 
+ 0123  51			    push cx 
+ 0124  52			    push dx 
+ 0125  56			    push si 
+ 0126  57			    push di 
+ 0127				weekday_frame: 
+ 0127  8B 76 04			    mov si,[bp+4] 
+ 012A  4E			    dec si 
+ 012B  8B FE			    mov di,si 
+ 012D  47			    inc di                             ; (year-
+				1)+1, Jan 1 of year 1 is Monday. 
+ 012E  8B C6			    mov ax,si 
+ 0130  BB 0004			    mov bx,4 
+ 0133  33 D2			    xor dx,dx 
+ 0135  F7 F3			    div bx 
+ 0137  03 F8			    add di,ax 
+Microsoft (R) Macro Assembler Version 5.00                  11/17/26 11:44:37
+                                                             Page     1-6
+
+
+ 0139  8B C6			    mov ax,si 
+ 013B  BB 0064			    mov bx,100 
+ 013E  33 D2			    xor dx,dx 
+ 0140  F7 F3			    div bx 
+ 0142  2B F8			    sub di,ax 
+ 0144  8B C6			    mov ax,si 
+ 0146  BB 0190			    mov bx,400 
+ 0149  33 D2			    xor dx,dx 
+ 014B  F7 F3			    div bx 
+ 014D  03 F8			    add di,ax 
+ 014F  8B 4E 06			    mov cx,[bp+6] 
+ 0152  49			    dec cx 
+ 0153  E3 0E			    jcxz weekday_reduce 
+ 0155  BB 0001			    mov bx,1 
+ 0158				add_month: 
+ 0158  8B 46 04			    mov ax,[bp+4] 
+ 015B  E8 0106 R		    call days_in_month 
+ 015E  03 F8			    add di,ax 
+ 0160  43			    inc bx 
+ 0161  E2 F5			    loop add_month 
+ 0163				weekday_reduce: 
+ 0163  8B C7			    mov ax,di 
+ 0165  BB 0007			    mov bx,7 
+ 0168  33 D2			    xor dx,dx 
+ 016A  F7 F3			    div bx 
+ 016C  8B C2			    mov ax,dx 
+ 016E  5F			    pop di 
+ 016F  5E			    pop si 
+ 0170  5A			    pop dx 
+ 0171  59			    pop cx 
+ 0172  5B			    pop bx 
+ 0173  5D			    pop bp 
+ 0174				weekday_return: 
+ 0174  C2 0004			    ret 4 
+ 0177				first_weekday endp 
+				 
+				; These targets are intentionally far away with
+				in CORE. 
+ 0177				bad_year: 
+ 0177  8D 16 00BE R		    lea dx,year_error 
+ 017B  9A 00B9 ---- R		    call far ptr write_string 
+ 0180  B8 4C01			    mov ax,4c01h 
+ 0183  CD 21			    int 21h 
+ 0185				bad_month: 
+ 0185  8D 16 00EB R		    lea dx,month_error 
+ 0189  9A 00B9 ---- R		    call far ptr write_string 
+ 018E  B8 4C01			    mov ax,4c01h 
+ 0191  CD 21			    int 21h 
+ 0193				core ends 
+				 
+ 0000				screen segment para public 'CODE' 
+				assume cs:screen,ds:data,ss:stack_seg 
+				; Data-segment parameters: selected_year/month,
+				 first_day, month_length. 
+Microsoft (R) Macro Assembler Version 5.00                  11/17/26 11:44:37
+                                                             Page     1-7
+
+
+				; FAR return restores both IP and CS. Preserve 
+				all used registers. 
+ 0000				render_calendar proc far 
+ 0000				render_enter: 
+ 0000  50			    push ax 
+ 0001  53			    push bx 
+ 0002  51			    push cx 
+ 0003  52			    push dx 
+ 0004  56			    push si 
+ 0005  57			    push di 
+ 0006  9A 00C0 ---- R		    call far ptr crlf 
+ 000B  A1 0000 R		    mov ax,selected_year 
+ 000E  E8 0091 R		    call print_unsigned 
+ 0011  8D 16 012D R		    lea dx,two_spaces 
+ 0015  9A 00B9 ---- R		    call far ptr write_string 
+ 001A  8B 1E 0002 R		    mov bx,selected_month 
+ 001E  4B			    dec bx 
+ 001F  D1 E3			    shl bx,1 
+ 0021  8B 97 0014 R		    mov dx,month_names[bx] 
+ 0025  9A 00B9 ---- R		    call far ptr write_string 
+ 002A  9A 00C0 ---- R		    call far ptr crlf 
+ 002F  8D 16 0116 R		    lea dx,weekdays 
+ 0033  9A 00B9 ---- R		    call far ptr write_string 
+ 0038  8B 0E 0004 R		    mov cx,first_day 
+ 003C  E3 0D			    jcxz begin_days 
+ 003E				leading_blanks: 
+ 003E  B2 20			    mov dl,' ' 
+ 0040  E8 00B2 R		    call put_char 
+ 0043  E8 00B2 R		    call put_char 
+ 0046  E8 00B2 R		    call put_char 
+ 0049  E2 F3			    loop leading_blanks 
+ 004B				begin_days: 
+ 004B  8B 1E 0004 R		    mov bx,first_day 
+ 004F  BE 0001			    mov si,1 
+ 0052				day_loop: 
+ 0052  8B C6			    mov ax,si 
+ 0054  E8 0081 R		    call print_day 
+ 0057  FE C3			    inc bl 
+ 0059  3B 36 0006 R		    cmp si,month_length 
+ 005D  73 16			    jae calendar_end 
+ 005F  80 FB 07			    cmp bl,7 
+ 0062  74 07			    je wrap_line 
+ 0064  B2 20			    mov dl,' ' 
+ 0066  E8 00B2 R		    call put_char 
+ 0069  EB 07			    jmp short next_day 
+ 006B				wrap_line: 
+ 006B  9A 00C0 ---- R		    call far ptr crlf 
+ 0070  32 DB			    xor bl,bl 
+ 0072				next_day: 
+ 0072  46			    inc si 
+ 0073  EB DD			    jmp short day_loop 
+ 0075				calendar_end: 
+ 0075  9A 00C0 ---- R		    call far ptr crlf 
+ 007A  5F			    pop di 
+Microsoft (R) Macro Assembler Version 5.00                  11/17/26 11:44:37
+                                                             Page     1-8
+
+
+ 007B  5E			    pop si 
+ 007C  5A			    pop dx 
+ 007D  59			    pop cx 
+ 007E  5B			    pop bx 
+ 007F  58			    pop ax 
+ 0080				render_return: 
+ 0080  CB			    retf 
+ 0081				render_calendar endp 
+				 
+				; Same-segment NEAR helper; right-align a date 
+				in two characters. 
+ 0081				print_day proc near 
+ 0081  50			    push ax 
+ 0082  3D 000A			    cmp ax,10 
+ 0085  73 05			    jae day_two 
+ 0087  B2 20			    mov dl,' ' 
+ 0089  E8 00B2 R		    call put_char 
+ 008C				day_two: 
+ 008C  E8 0091 R		    call print_unsigned 
+ 008F  58			    pop ax 
+ 0090  C3			    ret 
+ 0091				print_day endp 
+				 
+ 0091				print_unsigned proc near 
+ 0091  50			    push ax 
+ 0092  53			    push bx 
+ 0093  51			    push cx 
+ 0094  52			    push dx 
+ 0095  BB 000A			    mov bx,10 
+ 0098  33 C9			    xor cx,cx 
+ 009A				split_decimal: 
+ 009A  33 D2			    xor dx,dx 
+ 009C  F7 F3			    div bx 
+ 009E  52			    push dx 
+ 009F  41			    inc cx 
+ 00A0  0B C0			    or ax,ax 
+ 00A2  75 F6			    jnz split_decimal 
+ 00A4				write_decimal: 
+ 00A4  5A			    pop dx 
+ 00A5  80 C2 30			    add dl,'0' 
+ 00A8  E8 00B2 R		    call put_char 
+ 00AB  E2 F7			    loop write_decimal 
+ 00AD  5A			    pop dx 
+ 00AE  59			    pop cx 
+ 00AF  5B			    pop bx 
+ 00B0  58			    pop ax 
+ 00B1  C3			    ret 
+ 00B2				print_unsigned endp 
+				 
+ 00B2				put_char proc near 
+ 00B2  50			    push ax 
+ 00B3  B4 02			    mov ah,02h 
+ 00B5  CD 21			    int 21h 
+ 00B7  58			    pop ax 
+Microsoft (R) Macro Assembler Version 5.00                  11/17/26 11:44:37
+                                                             Page     1-9
+
+
+ 00B8  C3			    ret 
+ 00B9				put_char endp 
+				 
+ 00B9				write_string proc far 
+ 00B9  50			    push ax 
+ 00BA  B4 09			    mov ah,09h 
+ 00BC  CD 21			    int 21h 
+ 00BE  58			    pop ax 
+ 00BF  CB			    retf 
+ 00C0				write_string endp 
+				 
+ 00C0				crlf proc far 
+ 00C0  52			    push dx 
+ 00C1  B2 0D			    mov dl,13 
+ 00C3  E8 00B2 R		    call put_char 
+ 00C6  B2 0A			    mov dl,10 
+ 00C8  E8 00B2 R		    call put_char 
+ 00CB  5A			    pop dx 
+ 00CC  CB			    retf 
+ 00CD				crlf endp 
+ 00CD				screen ends 
+				end start 
+Microsoft (R) Macro Assembler Version 5.00                  11/17/26 11:44:37
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CORE . . . . . . . . . . . . . .  	0193	PARA	PUBLIC	'CODE'
+DATA . . . . . . . . . . . . . .  	0172	PARA	PUBLIC	'DATA'
+SCREEN . . . . . . . . . . . . .  	00CD	PARA	PUBLIC	'CODE'
+STACK_SEG  . . . . . . . . . . .  	0400	PARA	STACK	'STACK'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ADD_MONTH  . . . . . . . . . . .  	L NEAR	0158	CORE
+AFTER_RENDER . . . . . . . . . .  	L NEAR	0071	CORE
+AFTER_WEEKDAY  . . . . . . . . .  	L NEAR	0069	CORE
+
+BAD_MONTH  . . . . . . . . . . .  	L NEAR	0185	CORE
+BAD_YEAR . . . . . . . . . . . .  	L NEAR	0177	CORE
+BEFORE_RENDER  . . . . . . . . .  	L NEAR	006C	CORE
+BEFORE_WEEKDAY . . . . . . . . .  	L NEAR	0066	CORE
+BEGIN_DAYS . . . . . . . . . . .  	L NEAR	004B	SCREEN
+
+CALCULATE  . . . . . . . . . . .  	L NEAR	0051	CORE
+CALENDAR_END . . . . . . . . . .  	L NEAR	0075	SCREEN
+CRLF . . . . . . . . . . . . . .  	F PROC	00C0	SCREEN	Length = 000D
+
+DAYS_END . . . . . . . . . . . .  	L NEAR	011D	CORE
+DAYS_IN_MONTH  . . . . . . . . .  	N PROC	0106	CORE	Length = 0019
+DAY_LOOP . . . . . . . . . . . .  	L NEAR	0052	SCREEN
+DAY_TWO  . . . . . . . . . . . .  	L NEAR	008C	SCREEN
+
+FIRST_DAY  . . . . . . . . . . .  	L WORD	0004	DATA
+FIRST_WEEKDAY  . . . . . . . . .  	N PROC	011F	CORE	Length = 0058
+
+INPUT_BUF  . . . . . . . . . . .  	L BYTE	0130	DATA
+IS_LEAP  . . . . . . . . . . . .  	L NEAR	00FB	CORE
+
+LEADING_BLANKS . . . . . . . . .  	L NEAR	003E	SCREEN
+LEAP_END . . . . . . . . . . . .  	L NEAR	0102	CORE
+LEAP_YEAR  . . . . . . . . . . .  	N PROC	00D1	CORE	Length = 0035
+LENGTH_READY . . . . . . . . . .  	L NEAR	00A4	CORE
+
+M1 . . . . . . . . . . . . . . .  	L BYTE	002C	DATA
+M10  . . . . . . . . . . . . . .  	L BYTE	0068	DATA
+M11  . . . . . . . . . . . . . .  	L BYTE	0070	DATA
+M12  . . . . . . . . . . . . . .  	L BYTE	0079	DATA
+M2 . . . . . . . . . . . . . . .  	L BYTE	0034	DATA
+M3 . . . . . . . . . . . . . . .  	L BYTE	003D	DATA
+M4 . . . . . . . . . . . . . . .  	L BYTE	0043	DATA
+M5 . . . . . . . . . . . . . . .  	L BYTE	0049	DATA
+M6 . . . . . . . . . . . . . . .  	L BYTE	004D	DATA
+M7 . . . . . . . . . . . . . . .  	L BYTE	0052	DATA
+M8 . . . . . . . . . . . . . . .  	L BYTE	0057	DATA
+Microsoft (R) Macro Assembler Version 5.00                  11/17/26 11:44:37
+                                                             Symbols-2
+
+
+M9 . . . . . . . . . . . . . . .  	L BYTE	005E	DATA
+MONTH_DAYS . . . . . . . . . . .  	L BYTE	0008	DATA
+MONTH_ERROR  . . . . . . . . . .  	L BYTE	00EB	DATA
+MONTH_LENGTH . . . . . . . . . .  	L WORD	0006	DATA
+MONTH_MIN_OK . . . . . . . . . .  	L NEAR	0046	CORE
+MONTH_NAMES  . . . . . . . . . .  	L WORD	0014	DATA
+MONTH_OK . . . . . . . . . . . .  	L NEAR	004E	CORE
+MONTH_PARSED . . . . . . . . . .  	L NEAR	003E	CORE
+MONTH_PROMPT . . . . . . . . . .  	L BYTE	00A2	DATA
+
+NEXT_DAY . . . . . . . . . . . .  	L NEAR	0072	SCREEN
+NOT_LEAP . . . . . . . . . . . .  	L NEAR	0100	CORE
+
+ORDINARY_MONTH . . . . . . . . .  	L NEAR	0114	CORE
+
+PRINT_DAY  . . . . . . . . . . .  	N PROC	0081	SCREEN	Length = 0010
+PRINT_UNSIGNED . . . . . . . . .  	N PROC	0091	SCREEN	Length = 0021
+PUT_CHAR . . . . . . . . . . . .  	N PROC	00B2	SCREEN	Length = 0007
+
+READ_BAD . . . . . . . . . . . .  	L NEAR	00CA	CORE
+READ_DIGIT . . . . . . . . . . .  	L NEAR	00AD	CORE
+READ_END . . . . . . . . . . . .  	L NEAR	00CB	CORE
+READ_NUMBER  . . . . . . . . . .  	N PROC	0076	CORE	Length = 005B
+RENDER_CALENDAR  . . . . . . . .  	F PROC	0000	SCREEN	Length = 0081
+RENDER_ENTER . . . . . . . . . .  	L NEAR	0000	SCREEN
+RENDER_RETURN  . . . . . . . . .  	L NEAR	0080	SCREEN
+
+SELECTED_MONTH . . . . . . . . .  	L WORD	0002	DATA
+SELECTED_YEAR  . . . . . . . . .  	L WORD	0000	DATA
+SPLIT_DECIMAL  . . . . . . . . .  	L NEAR	009A	SCREEN
+START  . . . . . . . . . . . . .  	L NEAR	0000	CORE
+
+TWO_SPACES . . . . . . . . . . .  	L BYTE	012D	DATA
+
+WEEKDAYS . . . . . . . . . . . .  	L BYTE	0116	DATA
+WEEKDAY_FRAME  . . . . . . . . .  	L NEAR	0127	CORE
+WEEKDAY_REDUCE . . . . . . . . .  	L NEAR	0163	CORE
+WEEKDAY_RETURN . . . . . . . . .  	L NEAR	0174	CORE
+WRAP_LINE  . . . . . . . . . . .  	L NEAR	006B	SCREEN
+WRITE_DECIMAL  . . . . . . . . .  	L NEAR	00A4	SCREEN
+WRITE_STRING . . . . . . . . . .  	F PROC	00B9	SCREEN	Length = 0007
+
+YEAR_ERROR . . . . . . . . . . .  	L BYTE	00BE	DATA
+YEAR_MIN_OK  . . . . . . . . . .  	L NEAR	0020	CORE
+YEAR_OK  . . . . . . . . . . . .  	L NEAR	0028	CORE
+YEAR_PARSED  . . . . . . . . . .  	L NEAR	0018	CORE
+YEAR_PROMPT  . . . . . . . . . .  	L BYTE	0082	DATA
+
+@FILENAME  . . . . . . . . . . .  	TEXT  CALENDAR		
+
+Microsoft (R) Macro Assembler Version 5.00                  11/17/26 11:44:37
+                                                             Symbols-3
+
+
+
+    392 Source  Lines
+    392 Total   Lines
+     81 Symbols
+
+  51028 + 449132 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
