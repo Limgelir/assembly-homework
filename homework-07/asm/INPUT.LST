@@ -1,0 +1,152 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Page     1-1
+
+
+				; Buffered decimal input, linked into the same 
+				CORE segment as MAIN. 
+				include MACROS.INC 
+			     C	; Compile-time expansion; a macro itself has no
+				 runtime CALL or return address. 
+			     C	; This macro expands to LEA + a real FAR CALL t
+				o the output procedure. 
+			     C	PRINT_TEXT macro message 
+			     C	    lea dx,message 
+			     C	    call far ptr write_string 
+			     C	endm 
+			     C	 
+			     C	NEW_LINE macro 
+			     C	    call far ptr crlf 
+			     C	endm 
+			     C	 
+			     C	; LOCAL generates unique labels for the two exp
+				ansions in MAIN. 
+			     C	; Inverted short conditions skip a NEAR JMP, av
+				oiding the 8086 Jcc range limit. 
+			     C	REQUIRE_RANGE macro value,lower,upper,failure 
+			     C	    local lower_ok,range_ok 
+			     C	    cmp value,lower 
+			     C	    jae short lower_ok 
+			     C	    jmp near ptr failure 
+			     C	lower_ok: 
+			     C	    cmp value,upper 
+			     C	    jbe short range_ok 
+			     C	    jmp near ptr failure 
+			     C	range_ok: 
+			     C	endm 
+				 
+				extrn crlf:far 
+ 0000				data segment para public 'DATA' 
+				extrn input_buf:byte 
+ 0000				data ends 
+ 0000				core segment para public 'CODE' 
+				assume cs:core,ds:data 
+				public read_number 
+				; CL=max digits. Return AX=value, CF=0; CF=1 fo
+				r invalid input. 
+ 0000				read_number proc near 
+ 0000  53			    push bx 
+ 0001  51			    push cx 
+ 0002  52			    push dx 
+ 0003  56			    push si 
+ 0004  57			    push di 
+ 0005  8A D9			    mov bl,cl 
+ 0007  C6 06 0001 E 00		    mov input_buf[1],0 
+ 000C  8D 16 0000 E		    lea dx,input_buf 
+ 0010  B4 0A			    mov ah,0ah 
+ 0012  CD 21			    int 21h 
+				    NEW_LINE 
+ 0014  9A 0000 ---- E        1	    call far ptr crlf 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Page     1-2
+
+
+ 0019  33 C9			    xor cx,cx 
+ 001B  8A 0E 0001 E		    mov cl,input_buf[1] 
+ 001F  8D 36 0002 E		    lea si,input_buf[2] 
+ 0023  E3 2F			    jcxz read_bad 
+ 0025  80 3C 0A			    cmp byte ptr [si],10                ; CRLF 
+				files leave LF after prior CR. 
+ 0028  75 04			    jne length_ready 
+ 002A  46			    inc si 
+ 002B  49			    dec cx 
+ 002C  E3 26			    jcxz read_bad 
+ 002E				length_ready: 
+ 002E  3A CB			    cmp cl,bl 
+ 0030  77 22			    ja read_bad 
+ 0032  33 C0			    xor ax,ax 
+ 0034  BB 000A			    mov bx,10 
+ 0037				read_digit: 
+ 0037  8A 14			    mov dl,[si] 
+ 0039  80 FA 30			    cmp dl,'0' 
+ 003C  72 16			    jb read_bad 
+ 003E  80 FA 39			    cmp dl,'9' 
+ 0041  77 11			    ja read_bad 
+ 0043  80 EA 30			    sub dl,'0' 
+ 0046  32 F6			    xor dh,dh 
+ 0048  8B FA			    mov di,dx 
+ 004A  F7 E3			    mul bx 
+ 004C  03 C7			    add ax,di                          ; At mos
+				t 4 digits, no overflow. 
+ 004E  46			    inc si 
+ 004F  E2 E6			    loop read_digit 
+ 0051  F8			    clc 
+ 0052  EB 01			    jmp short read_end 
+ 0054				read_bad: 
+ 0054  F9			    stc 
+ 0055				read_end: 
+ 0055  5F			    pop di 
+ 0056  5E			    pop si 
+ 0057  5A			    pop dx 
+ 0058  59			    pop cx 
+ 0059  5B			    pop bx 
+ 005A  C3			    ret 
+ 005B				read_number endp 
+				 
+ 005B				core ends 
+				end 
+
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Symbols-1
+
+
+Macros:
+
+		N a m e			Lines
+
+NEW_LINE . . . . . . . . . . . .  	   1
+PRINT_TEXT . . . . . . . . . . .  	   2
+REQUIRE_RANGE  . . . . . . . . .  	   8
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CORE . . . . . . . . . . . . . .  	005B	PARA	PUBLIC	'CODE'
+DATA . . . . . . . . . . . . . .  	0000	PARA	PUBLIC	'DATA'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+CRLF . . . . . . . . . . . . . .  	L FAR 	0000		External
+
+INPUT_BUF  . . . . . . . . . . .  	V BYTE	0000	DATA	External
+
+LENGTH_READY . . . . . . . . . .  	L NEAR	002E	CORE
+
+READ_BAD . . . . . . . . . . . .  	L NEAR	0054	CORE
+READ_DIGIT . . . . . . . . . . .  	L NEAR	0037	CORE
+READ_END . . . . . . . . . . . .  	L NEAR	0055	CORE
+READ_NUMBER  . . . . . . . . . .  	N PROC	0000	CORE	Global	Length = 005B
+
+@FILENAME  . . . . . . . . . . .  	TEXT  INPUT		
+
+
+     88 Source  Lines
+     90 Total   Lines
+     15 Symbols
+
+  51098 + 449062 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

@@ -1,0 +1,214 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Page     1-1
+
+
+				; Main module: input workflow and calls to inde
+				pendently assembled modules. 
+				include MACROS.INC 
+			     C	; Compile-time expansion; a macro itself has no
+				 runtime CALL or return address. 
+			     C	; This macro expands to LEA + a real FAR CALL t
+				o the output procedure. 
+			     C	PRINT_TEXT macro message 
+			     C	    lea dx,message 
+			     C	    call far ptr write_string 
+			     C	endm 
+			     C	 
+			     C	NEW_LINE macro 
+			     C	    call far ptr crlf 
+			     C	endm 
+			     C	 
+			     C	; LOCAL generates unique labels for the two exp
+				ansions in MAIN. 
+			     C	; Inverted short conditions skip a NEAR JMP, av
+				oiding the 8086 Jcc range limit. 
+			     C	REQUIRE_RANGE macro value,lower,upper,failure 
+			     C	    local lower_ok,range_ok 
+			     C	    cmp value,lower 
+			     C	    jae short lower_ok 
+			     C	    jmp near ptr failure 
+			     C	lower_ok: 
+			     C	    cmp value,upper 
+			     C	    jbe short range_ok 
+			     C	    jmp near ptr failure 
+			     C	range_ok: 
+			     C	endm 
+				 
+				extrn write_string:far, render_calendar:far 
+ 0000				data segment para public 'DATA' 
+				extrn selected_year:word, selected_month:word, 
+				first_day:word, month_length:word 
+				extrn year_prompt:byte, month_prompt:byte, year
+				_error:byte, month_error:byte 
+ 0000				data ends 
+ 0000				stack_seg segment para stack 'STACK' 
+ 0000  0200[			    dw 512 dup (0a55ah) 
+	   A55A			
+			 ]	
+				
+ 0400				stack_seg ends 
+ 0000				core segment para public 'CODE' 
+				assume cs:core,ds:data,ss:stack_seg 
+				extrn read_number:near, days_in_month:near, fir
+				st_weekday:near 
+				public start, calculate, before_weekday, after_
+				weekday, before_render, after_render 
+ 0000				start: 
+ 0000  B8 ---- R		    mov ax,data 
+ 0003  8E D8			    mov ds,ax 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Page     1-2
+
+
+				    PRINT_TEXT year_prompt 
+ 0005  8D 16 0000 E          1	    lea dx,year_prompt 
+ 0009  9A 0000 ---- E        1	    call far ptr write_string 
+ 000E  B1 04			    mov cl,4 
+ 0010  E8 0000 E		    call read_number 
+ 0013  73 03			    jnc short year_parsed 
+ 0015  EB 5F 90			    jmp near ptr bad_year              ; Condit
+				ional target may exceed 127. 
+ 0018				year_parsed: 
+				    REQUIRE_RANGE ax,1900,2099,bad_year 
+ 0018  3D 076C               1	    cmp ax,1900 
+ 001B  73 03                 1	    jae short ??0000 
+ 001D  EB 57 90              1	    jmp near ptr bad_year 
+ 0020                        1	??0000: 
+ 0020  3D 0833               1	    cmp ax,2099 
+ 0023  76 03                 1	    jbe short ??0001 
+ 0025  EB 4F 90              1	    jmp near ptr bad_year 
+ 0028                        1	??0001: 
+ 0028  A3 0000 E		    mov selected_year,ax 
+				    PRINT_TEXT month_prompt 
+ 002B  8D 16 0000 E          1	    lea dx,month_prompt 
+ 002F  9A 0000 ---- E        1	    call far ptr write_string 
+ 0034  B1 02			    mov cl,2 
+ 0036  E8 0000 E		    call read_number 
+ 0039  73 03			    jnc short month_parsed 
+ 003B  EB 47 90			    jmp near ptr bad_month 
+ 003E				month_parsed: 
+				    REQUIRE_RANGE ax,1,12,bad_month 
+ 003E  3D 0001               1	    cmp ax,1 
+ 0041  73 03                 1	    jae short ??0002 
+ 0043  EB 3F 90              1	    jmp near ptr bad_month 
+ 0046                        1	??0002: 
+ 0046  3D 000C               1	    cmp ax,12 
+ 0049  76 03                 1	    jbe short ??0003 
+ 004B  EB 37 90              1	    jmp near ptr bad_month 
+ 004E                        1	??0003: 
+ 004E  A3 0000 E		    mov selected_month,ax 
+ 0051				calculate: 
+ 0051  A1 0000 E		    mov ax,selected_year 
+ 0054  8B 1E 0000 E		    mov bx,selected_month 
+ 0058  E8 0000 E		    call days_in_month                 ; Regist
+				er arguments AX/BX -> AX. 
+ 005B  A3 0000 E		    mov month_length,ax 
+ 005E  FF 36 0000 E		    push selected_month 
+ 0062  FF 36 0000 E		    push selected_year 
+ 0066				before_weekday: 
+ 0066  E8 0000 E		    call first_weekday                 ; Stack 
+				arguments, callee RET 4. 
+ 0069				after_weekday: 
+ 0069  A3 0000 E		    mov first_day,ax 
+ 006C				before_render: 
+ 006C  9A 0000 ---- E		    call far ptr render_calendar       ; Data-s
+				egment arguments; changes CS. 
+ 0071				after_render: 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Page     1-3
+
+
+ 0071  B8 4C00			    mov ax,4c00h 
+ 0074  CD 21			    int 21h 
+				 
+ 0076				bad_year: 
+				    PRINT_TEXT year_error 
+ 0076  8D 16 0000 E          1	    lea dx,year_error 
+ 007A  9A 0000 ---- E        1	    call far ptr write_string 
+ 007F  B8 4C01			    mov ax,4c01h 
+ 0082  CD 21			    int 21h 
+ 0084				bad_month: 
+				    PRINT_TEXT month_error 
+ 0084  8D 16 0000 E          1	    lea dx,month_error 
+ 0088  9A 0000 ---- E        1	    call far ptr write_string 
+ 008D  B8 4C01			    mov ax,4c01h 
+ 0090  CD 21			    int 21h 
+ 0092				core ends 
+				end start 
+
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Symbols-1
+
+
+Macros:
+
+		N a m e			Lines
+
+NEW_LINE . . . . . . . . . . . .  	   1
+PRINT_TEXT . . . . . . . . . . .  	   2
+REQUIRE_RANGE  . . . . . . . . .  	   8
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CORE . . . . . . . . . . . . . .  	0092	PARA	PUBLIC	'CODE'
+DATA . . . . . . . . . . . . . .  	0000	PARA	PUBLIC	'DATA'
+STACK_SEG  . . . . . . . . . . .  	0400	PARA	STACK	'STACK'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+AFTER_RENDER . . . . . . . . . .  	L NEAR	0071	CORE	Global
+AFTER_WEEKDAY  . . . . . . . . .  	L NEAR	0069	CORE	Global
+
+BAD_MONTH  . . . . . . . . . . .  	L NEAR	0084	CORE
+BAD_YEAR . . . . . . . . . . . .  	L NEAR	0076	CORE
+BEFORE_RENDER  . . . . . . . . .  	L NEAR	006C	CORE	Global
+BEFORE_WEEKDAY . . . . . . . . .  	L NEAR	0066	CORE	Global
+
+CALCULATE  . . . . . . . . . . .  	L NEAR	0051	CORE	Global
+
+DAYS_IN_MONTH  . . . . . . . . .  	L NEAR	0000	CORE	External
+
+FIRST_DAY  . . . . . . . . . . .  	V WORD	0000	DATA	External
+FIRST_WEEKDAY  . . . . . . . . .  	L NEAR	0000	CORE	External
+
+MONTH_ERROR  . . . . . . . . . .  	V BYTE	0000	DATA	External
+MONTH_LENGTH . . . . . . . . . .  	V WORD	0000	DATA	External
+MONTH_PARSED . . . . . . . . . .  	L NEAR	003E	CORE
+MONTH_PROMPT . . . . . . . . . .  	V BYTE	0000	DATA	External
+
+READ_NUMBER  . . . . . . . . . .  	L NEAR	0000	CORE	External
+RENDER_CALENDAR  . . . . . . . .  	L FAR 	0000		External
+
+SELECTED_MONTH . . . . . . . . .  	V WORD	0000	DATA	External
+SELECTED_YEAR  . . . . . . . . .  	V WORD	0000	DATA	External
+START  . . . . . . . . . . . . .  	L NEAR	0000	CORE	Global
+
+WRITE_STRING . . . . . . . . . .  	L FAR 	0000		External
+
+YEAR_ERROR . . . . . . . . . . .  	V BYTE	0000	DATA	External
+YEAR_PARSED  . . . . . . . . . .  	L NEAR	0018	CORE
+YEAR_PROMPT  . . . . . . . . . .  	V BYTE	0000	DATA	External
+
+??0000 . . . . . . . . . . . . .  	L NEAR	0020	CORE
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Symbols-2
+
+
+??0001 . . . . . . . . . . . . .  	L NEAR	0028	CORE
+??0002 . . . . . . . . . . . . .  	L NEAR	0046	CORE
+??0003 . . . . . . . . . . . . .  	L NEAR	004E	CORE
+@FILENAME  . . . . . . . . . . .  	TEXT  MAIN		
+
+
+     84 Source  Lines
+    109 Total   Lines
+     37 Symbols
+
+  51168 + 448992 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

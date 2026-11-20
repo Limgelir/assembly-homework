@@ -1,0 +1,281 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Page     1-1
+
+
+				; SCREEN is a distinct code segment; imported F
+				AR procedures end in RETF. 
+				include MACROS.INC 
+			     C	; Compile-time expansion; a macro itself has no
+				 runtime CALL or return address. 
+			     C	; This macro expands to LEA + a real FAR CALL t
+				o the output procedure. 
+			     C	PRINT_TEXT macro message 
+			     C	    lea dx,message 
+			     C	    call far ptr write_string 
+			     C	endm 
+			     C	 
+			     C	NEW_LINE macro 
+			     C	    call far ptr crlf 
+			     C	endm 
+			     C	 
+			     C	; LOCAL generates unique labels for the two exp
+				ansions in MAIN. 
+			     C	; Inverted short conditions skip a NEAR JMP, av
+				oiding the 8086 Jcc range limit. 
+			     C	REQUIRE_RANGE macro value,lower,upper,failure 
+			     C	    local lower_ok,range_ok 
+			     C	    cmp value,lower 
+			     C	    jae short lower_ok 
+			     C	    jmp near ptr failure 
+			     C	lower_ok: 
+			     C	    cmp value,upper 
+			     C	    jbe short range_ok 
+			     C	    jmp near ptr failure 
+			     C	range_ok: 
+			     C	endm 
+				 
+ 0000				data segment para public 'DATA' 
+				extrn selected_year:word, selected_month:word, 
+				first_day:word, month_length:word 
+				extrn month_names:word, weekdays:byte, two_spac
+				es:byte 
+ 0000				data ends 
+				public render_calendar, write_string, crlf, ren
+				der_enter, render_return 
+				public before_digits, after_digits, print_unsig
+				ned, unsigned_return 
+ 0000				screen segment para public 'CODE' 
+				assume cs:screen,ds:data 
+				; Data-segment parameters: selected_year/month,
+				 first_day, month_length. 
+				; FAR return restores both IP and CS. Preserve 
+				all used registers. 
+ 0000				render_calendar proc far 
+ 0000				render_enter: 
+ 0000  50			    push ax 
+ 0001  53			    push bx 
+ 0002  51			    push cx 
+ 0003  52			    push dx 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Page     1-2
+
+
+ 0004  56			    push si 
+ 0005  57			    push di 
+				    NEW_LINE 
+ 0006  9A 00C0 ---- R        1	    call far ptr crlf 
+ 000B  A1 0000 E		    mov ax,selected_year 
+ 000E				before_digits: 
+ 000E  E8 0091 R		    call print_unsigned 
+ 0011				after_digits: 
+				    PRINT_TEXT two_spaces 
+ 0011  8D 16 0000 E          1	    lea dx,two_spaces 
+ 0015  9A 00B9 ---- R        1	    call far ptr write_string 
+ 001A  8B 1E 0000 E		    mov bx,selected_month 
+ 001E  4B			    dec bx 
+ 001F  D1 E3			    shl bx,1 
+ 0021  8B 97 0000 E		    mov dx,month_names[bx] 
+ 0025  9A 00B9 ---- R		    call far ptr write_string 
+				    NEW_LINE 
+ 002A  9A 00C0 ---- R        1	    call far ptr crlf 
+				    PRINT_TEXT weekdays 
+ 002F  8D 16 0000 E          1	    lea dx,weekdays 
+ 0033  9A 00B9 ---- R        1	    call far ptr write_string 
+ 0038  8B 0E 0000 E		    mov cx,first_day 
+ 003C  E3 0D			    jcxz begin_days 
+ 003E				leading_blanks: 
+ 003E  B2 20			    mov dl,' ' 
+ 0040  E8 00B2 R		    call put_char 
+ 0043  E8 00B2 R		    call put_char 
+ 0046  E8 00B2 R		    call put_char 
+ 0049  E2 F3			    loop leading_blanks 
+ 004B				begin_days: 
+ 004B  8B 1E 0000 E		    mov bx,first_day 
+ 004F  BE 0001			    mov si,1 
+ 0052				day_loop: 
+ 0052  8B C6			    mov ax,si 
+ 0054  E8 0081 R		    call print_day 
+ 0057  FE C3			    inc bl 
+ 0059  3B 36 0000 E		    cmp si,month_length 
+ 005D  73 16			    jae calendar_end 
+ 005F  80 FB 07			    cmp bl,7 
+ 0062  74 07			    je wrap_line 
+ 0064  B2 20			    mov dl,' ' 
+ 0066  E8 00B2 R		    call put_char 
+ 0069  EB 07			    jmp short next_day 
+ 006B				wrap_line: 
+				    NEW_LINE 
+ 006B  9A 00C0 ---- R        1	    call far ptr crlf 
+ 0070  32 DB			    xor bl,bl 
+ 0072				next_day: 
+ 0072  46			    inc si 
+ 0073  EB DD			    jmp short day_loop 
+ 0075				calendar_end: 
+				    NEW_LINE 
+ 0075  9A 00C0 ---- R        1	    call far ptr crlf 
+ 007A  5F			    pop di 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Page     1-3
+
+
+ 007B  5E			    pop si 
+ 007C  5A			    pop dx 
+ 007D  59			    pop cx 
+ 007E  5B			    pop bx 
+ 007F  58			    pop ax 
+ 0080				render_return: 
+ 0080  CB			    retf 
+ 0081				render_calendar endp 
+				 
+				; Same-segment NEAR helper; right-align a date 
+				in two characters. 
+ 0081				print_day proc near 
+ 0081  50			    push ax 
+ 0082  3D 000A			    cmp ax,10 
+ 0085  73 05			    jae day_two 
+ 0087  B2 20			    mov dl,' ' 
+ 0089  E8 00B2 R		    call put_char 
+ 008C				day_two: 
+ 008C  E8 0091 R		    call print_unsigned 
+ 008F  58			    pop ax 
+ 0090  C3			    ret 
+ 0091				print_day endp 
+				 
+ 0091				print_unsigned proc near 
+ 0091  50			    push ax 
+ 0092  53			    push bx 
+ 0093  51			    push cx 
+ 0094  52			    push dx 
+ 0095  BB 000A			    mov bx,10 
+ 0098  33 C9			    xor cx,cx 
+ 009A				split_decimal: 
+ 009A  33 D2			    xor dx,dx 
+ 009C  F7 F3			    div bx 
+ 009E  52			    push dx 
+ 009F  41			    inc cx 
+ 00A0  0B C0			    or ax,ax 
+ 00A2  75 F6			    jnz split_decimal 
+ 00A4				write_decimal: 
+ 00A4  5A			    pop dx 
+ 00A5  80 C2 30			    add dl,'0' 
+ 00A8  E8 00B2 R		    call put_char 
+ 00AB  E2 F7			    loop write_decimal 
+ 00AD  5A			    pop dx 
+ 00AE  59			    pop cx 
+ 00AF  5B			    pop bx 
+ 00B0  58			    pop ax 
+ 00B1				unsigned_return: 
+ 00B1  C3			    ret 
+ 00B2				print_unsigned endp 
+				 
+ 00B2				put_char proc near 
+ 00B2  50			    push ax 
+ 00B3  B4 02			    mov ah,02h 
+ 00B5  CD 21			    int 21h 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Page     1-4
+
+
+ 00B7  58			    pop ax 
+ 00B8  C3			    ret 
+ 00B9				put_char endp 
+				 
+ 00B9				write_string proc far 
+ 00B9  50			    push ax 
+ 00BA  B4 09			    mov ah,09h 
+ 00BC  CD 21			    int 21h 
+ 00BE  58			    pop ax 
+ 00BF  CB			    retf 
+ 00C0				write_string endp 
+				 
+ 00C0				crlf proc far 
+ 00C0  52			    push dx 
+ 00C1  B2 0D			    mov dl,13 
+ 00C3  E8 00B2 R		    call put_char 
+ 00C6  B2 0A			    mov dl,10 
+ 00C8  E8 00B2 R		    call put_char 
+ 00CB  5A			    pop dx 
+ 00CC  CB			    retf 
+ 00CD				crlf endp 
+ 00CD				screen ends 
+				end 
+
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Symbols-1
+
+
+Macros:
+
+		N a m e			Lines
+
+NEW_LINE . . . . . . . . . . . .  	   1
+PRINT_TEXT . . . . . . . . . . .  	   2
+REQUIRE_RANGE  . . . . . . . . .  	   8
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DATA . . . . . . . . . . . . . .  	0000	PARA	PUBLIC	'DATA'
+SCREEN . . . . . . . . . . . . .  	00CD	PARA	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+AFTER_DIGITS . . . . . . . . . .  	L NEAR	0011	SCREEN	Global
+
+BEFORE_DIGITS  . . . . . . . . .  	L NEAR	000E	SCREEN	Global
+BEGIN_DAYS . . . . . . . . . . .  	L NEAR	004B	SCREEN
+
+CALENDAR_END . . . . . . . . . .  	L NEAR	0075	SCREEN
+CRLF . . . . . . . . . . . . . .  	F PROC	00C0	SCREEN	Global	Length = 000D
+
+DAY_LOOP . . . . . . . . . . . .  	L NEAR	0052	SCREEN
+DAY_TWO  . . . . . . . . . . . .  	L NEAR	008C	SCREEN
+
+FIRST_DAY  . . . . . . . . . . .  	V WORD	0000	DATA	External
+
+LEADING_BLANKS . . . . . . . . .  	L NEAR	003E	SCREEN
+
+MONTH_LENGTH . . . . . . . . . .  	V WORD	0000	DATA	External
+MONTH_NAMES  . . . . . . . . . .  	V WORD	0000	DATA	External
+
+NEXT_DAY . . . . . . . . . . . .  	L NEAR	0072	SCREEN
+
+PRINT_DAY  . . . . . . . . . . .  	N PROC	0081	SCREEN	Length = 0010
+PRINT_UNSIGNED . . . . . . . . .  	N PROC	0091	SCREEN	Global	Length = 0021
+PUT_CHAR . . . . . . . . . . . .  	N PROC	00B2	SCREEN	Length = 0007
+
+RENDER_CALENDAR  . . . . . . . .  	F PROC	0000	SCREEN	Global	Length = 0081
+RENDER_ENTER . . . . . . . . . .  	L NEAR	0000	SCREEN	Global
+RENDER_RETURN  . . . . . . . . .  	L NEAR	0080	SCREEN	Global
+
+SELECTED_MONTH . . . . . . . . .  	V WORD	0000	DATA	External
+SELECTED_YEAR  . . . . . . . . .  	V WORD	0000	DATA	External
+SPLIT_DECIMAL  . . . . . . . . .  	L NEAR	009A	SCREEN
+
+TWO_SPACES . . . . . . . . . . .  	V BYTE	0000	DATA	External
+
+UNSIGNED_RETURN  . . . . . . . .  	L NEAR	00B1	SCREEN	Global
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Symbols-2
+
+
+
+WEEKDAYS . . . . . . . . . . . .  	V BYTE	0000	DATA	External
+WRAP_LINE  . . . . . . . . . . .  	L NEAR	006B	SCREEN
+WRITE_DECIMAL  . . . . . . . . .  	L NEAR	00A4	SCREEN
+WRITE_STRING . . . . . . . . . .  	F PROC	00B9	SCREEN	Global	Length = 0007
+
+@FILENAME  . . . . . . . . . . .  	TEXT  SCREEN		
+
+
+    164 Source  Lines
+    173 Total   Lines
+     35 Symbols
+
+  51080 + 449080 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

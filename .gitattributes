@@ -19,3 +19,6 @@ homework-04/checker/verification/*.txt -text -whitespace
 *.SYMBOLS.txt -text -whitespace
 homework-05/verification/*.txt -text -whitespace
 homework-06/verification/*.txt -text -whitespace
+*.INC text eol=crlf
+homework-07/asm/CALENDAR.MAP -text -whitespace
+homework-07/verification/*.txt -text -whitespace

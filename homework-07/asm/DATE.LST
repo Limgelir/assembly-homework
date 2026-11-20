@@ -1,0 +1,185 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Page     1-1
+
+
+				; Calendar arithmetic; PUBLIC CORE combines wit
+				h MAIN and INPUT at link time. 
+ 0000				data segment para public 'DATA' 
+				extrn month_days:byte 
+ 0000				data ends 
+ 0000				core segment para public 'CODE' 
+				assume cs:core,ds:data 
+				public leap_year, days_in_month, first_weekday,
+				 weekday_frame, weekday_return 
+				; Register argument AX=year -> AX=0/1; preserve
+				 BX/CX/DX. 
+ 0000				leap_year proc near 
+ 0000  53			    push bx 
+ 0001  51			    push cx 
+ 0002  52			    push dx 
+ 0003  8B C8			    mov cx,ax 
+ 0005  BB 0004			    mov bx,4 
+ 0008  33 D2			    xor dx,dx 
+ 000A  F7 F3			    div bx 
+ 000C  0B D2			    or dx,dx 
+ 000E  75 1F			    jnz not_leap 
+ 0010  8B C1			    mov ax,cx 
+ 0012  BB 0064			    mov bx,100 
+ 0015  33 D2			    xor dx,dx 
+ 0017  F7 F3			    div bx 
+ 0019  0B D2			    or dx,dx 
+ 001B  75 0D			    jnz is_leap 
+ 001D  8B C1			    mov ax,cx 
+ 001F  BB 0190			    mov bx,400 
+ 0022  33 D2			    xor dx,dx 
+ 0024  F7 F3			    div bx 
+ 0026  0B D2			    or dx,dx 
+ 0028  75 05			    jnz not_leap 
+ 002A				is_leap: 
+ 002A  B8 0001			    mov ax,1 
+ 002D  EB 02			    jmp short leap_end 
+ 002F				not_leap: 
+ 002F  33 C0			    xor ax,ax 
+ 0031				leap_end: 
+ 0031  5A			    pop dx 
+ 0032  59			    pop cx 
+ 0033  5B			    pop bx 
+ 0034  C3			    ret 
+ 0035				leap_year endp 
+				 
+				; AX=year, BX=month (1..12) -> AX=28..31. Other
+				 registers preserved. 
+ 0035				days_in_month proc near 
+ 0035  56			    push si 
+ 0036  83 FB 02			    cmp bx,2 
+ 0039  75 08			    jne ordinary_month 
+ 003B  E8 0000 R		    call leap_year 
+ 003E  05 001C			    add ax,28 
+ 0041  EB 09			    jmp short days_end 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Page     1-2
+
+
+ 0043				ordinary_month: 
+ 0043  8B F3			    mov si,bx 
+ 0045  4E			    dec si 
+ 0046  33 C0			    xor ax,ax 
+ 0048  8A 84 0000 E		    mov al,month_days[si] 
+ 004C				days_end: 
+ 004C  5E			    pop si 
+ 004D  C3			    ret 
+ 004E				days_in_month endp 
+				 
+				; Caller pushes month, then year. AX=weekday, S
+				unday=0. 
+				; [BP+4]=year, [BP+6]=month; RET 4 removes the 
+				two arguments. 
+ 004E				first_weekday proc near 
+ 004E  55			    push bp 
+ 004F  8B EC			    mov bp,sp 
+ 0051  53			    push bx 
+ 0052  51			    push cx 
+ 0053  52			    push dx 
+ 0054  56			    push si 
+ 0055  57			    push di 
+ 0056				weekday_frame: 
+ 0056  8B 76 04			    mov si,[bp+4] 
+ 0059  4E			    dec si 
+ 005A  8B FE			    mov di,si 
+ 005C  47			    inc di                             ; (year-
+				1)+1, Jan 1 of year 1 is Monday. 
+ 005D  8B C6			    mov ax,si 
+ 005F  BB 0004			    mov bx,4 
+ 0062  33 D2			    xor dx,dx 
+ 0064  F7 F3			    div bx 
+ 0066  03 F8			    add di,ax 
+ 0068  8B C6			    mov ax,si 
+ 006A  BB 0064			    mov bx,100 
+ 006D  33 D2			    xor dx,dx 
+ 006F  F7 F3			    div bx 
+ 0071  2B F8			    sub di,ax 
+ 0073  8B C6			    mov ax,si 
+ 0075  BB 0190			    mov bx,400 
+ 0078  33 D2			    xor dx,dx 
+ 007A  F7 F3			    div bx 
+ 007C  03 F8			    add di,ax 
+ 007E  8B 4E 06			    mov cx,[bp+6] 
+ 0081  49			    dec cx 
+ 0082  E3 0E			    jcxz weekday_reduce 
+ 0084  BB 0001			    mov bx,1 
+ 0087				add_month: 
+ 0087  8B 46 04			    mov ax,[bp+4] 
+ 008A  E8 0035 R		    call days_in_month 
+ 008D  03 F8			    add di,ax 
+ 008F  43			    inc bx 
+ 0090  E2 F5			    loop add_month 
+ 0092				weekday_reduce: 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Page     1-3
+
+
+ 0092  8B C7			    mov ax,di 
+ 0094  BB 0007			    mov bx,7 
+ 0097  33 D2			    xor dx,dx 
+ 0099  F7 F3			    div bx 
+ 009B  8B C2			    mov ax,dx 
+ 009D  5F			    pop di 
+ 009E  5E			    pop si 
+ 009F  5A			    pop dx 
+ 00A0  59			    pop cx 
+ 00A1  5B			    pop bx 
+ 00A2  5D			    pop bp 
+ 00A3				weekday_return: 
+ 00A3  C2 0004			    ret 4 
+ 00A6				first_weekday endp 
+				 
+ 00A6				core ends 
+				end 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+CORE . . . . . . . . . . . . . .  	00A6	PARA	PUBLIC	'CODE'
+DATA . . . . . . . . . . . . . .  	0000	PARA	PUBLIC	'DATA'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ADD_MONTH  . . . . . . . . . . .  	L NEAR	0087	CORE
+
+DAYS_END . . . . . . . . . . . .  	L NEAR	004C	CORE
+DAYS_IN_MONTH  . . . . . . . . .  	N PROC	0035	CORE	Global	Length = 0019
+
+FIRST_WEEKDAY  . . . . . . . . .  	N PROC	004E	CORE	Global	Length = 0058
+
+IS_LEAP  . . . . . . . . . . . .  	L NEAR	002A	CORE
+
+LEAP_END . . . . . . . . . . . .  	L NEAR	0031	CORE
+LEAP_YEAR  . . . . . . . . . . .  	N PROC	0000	CORE	Global	Length = 0035
+
+MONTH_DAYS . . . . . . . . . . .  	V BYTE	0000	DATA	External
+
+NOT_LEAP . . . . . . . . . . . .  	L NEAR	002F	CORE
+
+ORDINARY_MONTH . . . . . . . . .  	L NEAR	0043	CORE
+
+WEEKDAY_FRAME  . . . . . . . . .  	L NEAR	0056	CORE	Global
+WEEKDAY_REDUCE . . . . . . . . .  	L NEAR	0092	CORE
+WEEKDAY_RETURN . . . . . . . . .  	L NEAR	00A3	CORE	Global
+
+@FILENAME  . . . . . . . . . . .  	TEXT  DATE		
+
+
+    118 Source  Lines
+    118 Total   Lines
+     18 Symbols
+
+  51102 + 465442 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

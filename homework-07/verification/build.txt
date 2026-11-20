@@ -1,0 +1,49 @@
+=== MAIN ===
+Microsoft (R) Macro Assembler Version 5.00 
+Copyright (C) Microsoft Corp 1981-1985, 1987.  All rights reserved.
+
+
+  51168 + 448992 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
+=== INPUT ===
+Microsoft (R) Macro Assembler Version 5.00 
+Copyright (C) Microsoft Corp 1981-1985, 1987.  All rights reserved.
+
+
+  51098 + 449062 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
+=== DATE ===
+Microsoft (R) Macro Assembler Version 5.00 
+Copyright (C) Microsoft Corp 1981-1985, 1987.  All rights reserved.
+
+
+  51102 + 465442 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
+=== SCREEN ===
+Microsoft (R) Macro Assembler Version 5.00 
+Copyright (C) Microsoft Corp 1981-1985, 1987.  All rights reserved.
+
+
+  51080 + 449080 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
+=== DATA ===
+Microsoft (R) Macro Assembler Version 5.00 
+Copyright (C) Microsoft Corp 1981-1985, 1987.  All rights reserved.
+
+
+  51250 + 465294 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
+=== LINK ===
+
+Microsoft (R) Overlay Linker  Version 3.60
+Copyright (C) Microsoft Corp 1983-1987.  All rights reserved.

@@ -1,0 +1,147 @@
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Page     1-1
+
+
+				; Shared data definitions: storage allocated ex
+				actly once. 
+ 0000				data segment para public 'DATA' 
+				public selected_year, selected_month, first_day
+				, month_length 
+				public month_days, month_names, year_prompt, mo
+				nth_prompt 
+				public year_error, month_error, weekdays, two_s
+				paces, input_buf 
+ 0000  07EA			selected_year dw 2026 
+ 0002  000B			selected_month dw 11 
+ 0004  0000			first_day dw 0 
+ 0006  0000			month_length dw 0 
+ 0008  1F 1C 1F 1E 1F 1E 1F	month_days db 31,28,31,30,31,30,31,31,30,31,30,
+				31 
+       1F 1E 1F 1E 1F		
+ 0014  002C R 0034 R 003D R	month_names dw offset m1,offset m2,offset m3,of
+				fset m4,offset m5,offset m6,offset m7,offset m8
+				,offset m9,offset m10,offset m11,offse
+       0043 R 0049 R 004D R	
+       0052 R 0057 R 005E R	
+       0068 R 0070 R 0079 R	
+ 002C  4A 61 6E 75 61 72 79	m1 db 'January$' 
+       24			
+ 0034  46 65 62 72 75 61 72	m2 db 'February$' 
+       79 24			
+ 003D  4D 61 72 63 68 24	m3 db 'March$' 
+ 0043  41 70 72 69 6C 24	m4 db 'April$' 
+ 0049  4D 61 79 24		m5 db 'May$' 
+ 004D  4A 75 6E 65 24		m6 db 'June$' 
+ 0052  4A 75 6C 79 24		m7 db 'July$' 
+ 0057  41 75 67 75 73 74 24	m8 db 'August$' 
+ 005E  53 65 70 74 65 6D 62	m9 db 'September$' 
+       65 72 24			
+ 0068  4F 63 74 6F 62 65 72	m10 db 'October$' 
+       24			
+ 0070  4E 6F 76 65 6D 62 65	m11 db 'November$' 
+       72 24			
+ 0079  44 65 63 65 6D 62 65	m12 db 'December$' 
+       72 24			
+ 0082  50 6C 65 61 73 65 20	year_prompt db 'Please input year (1900-2099): 
+				$' 
+       69 6E 70 75 74 20 79	
+       65 61 72 20 28 31 39	
+       30 30 2D 32 30 39 39	
+       29 3A 20 24		
+ 00A2  50 6C 65 61 73 65 20	month_prompt db 'Please input month (1-12): $' 
+       69 6E 70 75 74 20 6D	
+       6F 6E 74 68 20 28 31	
+       2D 31 32 29 3A 20 24	
+ 00BE  45 72 72 6F 72 3A 20	year_error db 'Error: year must be 1900..2099 (
+				4 digits).',13,10,'$' 
+       79 65 61 72 20 6D 75	
+       73 74 20 62 65 20 31	
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Page     1-2
+
+
+       39 30 30 2E 2E 32 30	
+       39 39 20 28 34 20 64	
+       69 67 69 74 73 29 2E	
+       0D 0A 24			
+ 00EB  45 72 72 6F 72 3A 20	month_error db 'Error: month must be 1..12 (1-2
+				 digits).',13,10,'$' 
+       6D 6F 6E 74 68 20 6D	
+       75 73 74 20 62 65 20	
+       31 2E 2E 31 32 20 28	
+       31 2D 32 20 64 69 67	
+       69 74 73 29 2E 0D 0A	
+       24			
+ 0116  53 75 20 4D 6F 20 54	weekdays db 'Su Mo Tu We Th Fr Sa',13,10,'$' 
+       75 20 57 65 20 54 68	
+       20 46 72 20 53 61 0D	
+       0A 24			
+ 012D  20 20 24			two_spaces db '  $' 
+ 0130  40 00			input_buf db 64,0,64 dup (0) 
+       0040[			
+	   00			
+			 ]	
+				
+ 0172				data ends 
+				end 
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DATA . . . . . . . . . . . . . .  	0172	PARA	PUBLIC	'DATA'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+FIRST_DAY  . . . . . . . . . . .  	L WORD	0004	DATA	Global
+
+INPUT_BUF  . . . . . . . . . . .  	L BYTE	0130	DATA	Global
+
+M1 . . . . . . . . . . . . . . .  	L BYTE	002C	DATA
+M10  . . . . . . . . . . . . . .  	L BYTE	0068	DATA
+M11  . . . . . . . . . . . . . .  	L BYTE	0070	DATA
+M12  . . . . . . . . . . . . . .  	L BYTE	0079	DATA
+M2 . . . . . . . . . . . . . . .  	L BYTE	0034	DATA
+M3 . . . . . . . . . . . . . . .  	L BYTE	003D	DATA
+M4 . . . . . . . . . . . . . . .  	L BYTE	0043	DATA
+M5 . . . . . . . . . . . . . . .  	L BYTE	0049	DATA
+M6 . . . . . . . . . . . . . . .  	L BYTE	004D	DATA
+M7 . . . . . . . . . . . . . . .  	L BYTE	0052	DATA
+M8 . . . . . . . . . . . . . . .  	L BYTE	0057	DATA
+M9 . . . . . . . . . . . . . . .  	L BYTE	005E	DATA
+MONTH_DAYS . . . . . . . . . . .  	L BYTE	0008	DATA	Global
+MONTH_ERROR  . . . . . . . . . .  	L BYTE	00EB	DATA	Global
+MONTH_LENGTH . . . . . . . . . .  	L WORD	0006	DATA	Global
+MONTH_NAMES  . . . . . . . . . .  	L WORD	0014	DATA	Global
+MONTH_PROMPT . . . . . . . . . .  	L BYTE	00A2	DATA	Global
+
+SELECTED_MONTH . . . . . . . . .  	L WORD	0002	DATA	Global
+SELECTED_YEAR  . . . . . . . . .  	L WORD	0000	DATA	Global
+
+TWO_SPACES . . . . . . . . . . .  	L BYTE	012D	DATA	Global
+
+WEEKDAYS . . . . . . . . . . . .  	L BYTE	0116	DATA	Global
+
+YEAR_ERROR . . . . . . . . . . .  	L BYTE	00BE	DATA	Global
+YEAR_PROMPT  . . . . . . . . . .  	L BYTE	0082	DATA	Global
+
+@FILENAME  . . . . . . . . . . .  	TEXT  DATA		
+
+Microsoft (R) Macro Assembler Version 5.00                  11/21/26 02:15:22
+                                                             Symbols-2
+
+
+
+     32 Source  Lines
+     32 Total   Lines
+     28 Symbols
+
+  51250 + 465294 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
